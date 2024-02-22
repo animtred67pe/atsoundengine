@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Sound Decoder Engine</title>
+		<style>
+			body {
+				margin: 0;
+				overflow: hidden;
+				font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+			}
+			.hfgfhh {
+				background-color: #000;
+				width: 100%;
+				height: 100%;
+				position: absolute;
+			}
+			#audiocontextcontrol {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+		</style>
+	</head>
+	<body id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+		<div class="hfgfhh">
+			<div id="audiocontextcontrol"></div>
+			<div style="background-color: #000; padding: 5px 6px; position: absolute; top: 5px; left: 5px;">
+				<a href="#" id="loadmidifile" style="color: #fff;">Open Audio From File</a>
+			</div>
+		</div>
+		<script src="atsounddecoderengine.js"></script>
+		<script>
+			function mod(x, y) {
+				var r = x % y;
+				if (r / y < 0) {
+				r += y;
+				}
+				return r; 
+			};
+			function getDuraction(num) {
+				var txt = '';
+				if (Math.floor(num) > 3599) {
+					txt += '' + Math.floor(num / 3600);
+					txt += ':';
+					if (mod(Math.floor(num / 60), 60) > 9) {
+						txt += '' + mod(Math.floor(num / 60), 60);
+					} else {
+						txt += '0' + mod(Math.floor(num / 60), 60);
+					}
+					txt += ':';
+					if (mod(Math.floor(num), 60) > 9) {
+						txt += '' + mod(Math.floor(num), 60);
+					} else {
+						txt += '0' + mod(Math.floor(num), 60);
+					}
+				} else {
+					txt += '' + mod(Math.floor(num / 60), 60);
+					txt += ':';
+					if (mod(Math.floor(num), 60) > 9) {
+						txt += '' + mod(Math.floor(num), 60);
+					} else {
+						txt += '0' + mod(Math.floor(num), 60);
+					}
+				}
+				return txt;
+			}
+			function _createImage(url) {
+				const img = new Image;
+				img.src = url;
+				return img;
+			}
+			function mod(x, y) {
+				var r = x % y;
+				if (r / y < 0) {
+				r += y;
+				}
+				return r; 
+			};
+			function z_dir(dx,dy) {
+				return Math.sqrt((dx * dx) + (dy * dy));
+			}
+			function cosiLINE(x, y, width, r, tx, ty) {
+				return (tx > (x - r)) && (tx < ((x + width) + r)) && (ty > (y - r)) && (ty < (y + r));
+			}
+			var ATPlayer = function () {
+				this._player = new ATSoundDecoderEngine.Player();
+				this._player.setVolume(1);
+				this.volumeimg = _createImage('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHdpZHRoPSIzNy43NjMzOSIgaGVpZ2h0PSIzOS43ODMiIHZpZXdCb3g9IjAsMCwzNy43NjMzOSwzOS43ODMiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMjIuMzc4OTYsLTE2MC41NTQyMikiPjxnIGRhdGEtcGFwZXItZGF0YT0ieyZxdW90O2lzUGFpbnRpbmdMYXllciZxdW90Ozp0cnVlfSIgZmlsbD0iIzAwMDAwMCIgZmlsbC1ydWxlPSJub256ZXJvIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMCIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgc3Ryb2tlLWRhc2hhcnJheT0iIiBzdHJva2UtZGFzaG9mZnNldD0iMCIgc3R5bGU9Im1peC1ibGVuZC1tb2RlOiBub3JtYWwiPjxwYXRoIGQ9Ik0yMjIuMzc4OTYsMTkxLjM2MjM5di0yMi42MjE3OGg4LjAzNzc2bDkuODE1MjksLTguMTg2MzlsMC4wODM0NSwzOS4yMzQ4OWwtOS44OTg3MywtOC40MjY3MXoiLz48cGF0aCBkPSJNMjQxLjM1MjMyLDE4OS42MDk2MnYtMTguNDE4OTdjMCwwIDguMTQ5OTksMC43ODAwNSA4LjE0OTk5LDguNjM4OTljMCw5LjM1MjkyIC04LjE0OTk5LDkuNzc5OTkgLTguMTQ5OTksOS43Nzk5OXoiLz48cGF0aCBkPSJNMjQxLjc2NjcyLDIwMC4zMzcyMWMwLDAgMC4xMTcsLTUuMjc3MyAwLjExNywtNS4yNzczYzAsMCAxMy4wMjEsLTMuMjUzNDkgMTMuNDEwODksLTE0LjYxNDJjMC40MTg1MywtMTIuMTk1MjMgLTEzLjY1OTQ0LC0xNC45MDU5NyAtMTMuNjU5NDQsLTE0LjkwNTk3bDAuMTMxNTUsLTQuOTg1NTNjMCwwIDE4LjA2MjAzLDAuMTUxMTUgMTguMzcxMjYsMTguOTI0NTVjMC4zMzIwMiwyMC4xNTY1MiAtMTguMzcxMjYsMjAuODU4NDUgLTE4LjM3MTI2LDIwLjg1ODQ1eiIvPjwvZz48L2c+PC9zdmc+');
+				this.volumeoffimg = _createImage('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHdpZHRoPSI0MSIgaGVpZ2h0PSI0MSIgdmlld0JveD0iMCwwLDQxLDQxIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjE5LjUsLTE1OS41KSI+PGcgZGF0YS1wYXBlci1kYXRhPSJ7JnF1b3Q7aXNQYWludGluZ0xheWVyJnF1b3Q7OnRydWV9IiBmaWxsLXJ1bGU9Im5vbnplcm8iIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgc3Ryb2tlLWRhc2hhcnJheT0iIiBzdHJva2UtZGFzaG9mZnNldD0iMCIgc3R5bGU9Im1peC1ibGVuZC1tb2RlOiBub3JtYWwiPjxwYXRoIGQ9Ik0yMjIuMzc4OTYsMTkxLjM2MjM5di0yMi42MjE3OGg4LjAzNzc2bDkuODE1MjksLTguMTg2MzlsMC4wODM0NSwzOS4yMzQ4OWwtOS44OTg3MywtOC40MjY3MXoiIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIvPjxwYXRoIGQ9Ik0yNDEuMzUyMzIsMTg5LjYwOTYydi0xOC40MTg5N2MwLDAgOC4xNDk5OSwwLjc4MDA1IDguMTQ5OTksOC42Mzg5OWMwLDkuMzUyOTIgLTguMTQ5OTksOS43Nzk5OSAtOC4xNDk5OSw5Ljc3OTk5eiIgZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjAiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTI0MS43NjY3MiwyMDAuMzM3MjFsMC4xMTcsLTUuMjc3M2MwLDAgMTMuMDIxLC0zLjI1MzQ5IDEzLjQxMDg5LC0xNC42MTQyYzAuNDE4NTMsLTEyLjE5NTIzIC0xMy42NTk0NCwtMTQuOTA1OTcgLTEzLjY1OTQ0LC0xNC45MDU5N2wwLjEzMTU1LC00Ljk4NTUzYzAsMCAxOC4wNjIwMywwLjE1MTE1IDE4LjM3MTI2LDE4LjkyNDU1YzAuMzMyMDIsMjAuMTU2NTIgLTE4LjM3MTI2LDIwLjg1ODQ1IC0xOC4zNzEyNiwyMC44NTg0NXoiIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIvPjxwYXRoIGQ9Ik0yMjIuNSwxNjIuNWwzNSwzNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvZz48L2c+PC9zdmc+');
+		    	this.mousePressed = false;
+		    	this.loop = false;
+		    	this.autoPlay = false;
+		    	this.mouseX = 0;
+		    	this.mouseY = 0;
+    			this.ToPlayAudio = 0;
+    			this.ToVolume = 0;
+				this.canvas = document.createElement('canvas');
+				this.ctx = this.canvas.getContext('2d');
+		        this.interval = null;
+		        this.variableNotUse = {"mouseDown":false};
+			}
+			ATPlayer.prototype.init = function(dix) {
+				var _this = this;
+				dix.appendChild(this.canvas);
+				this.canvas.onmousedown = function () {
+					_this.mousePressed = true;
+				}
+				this.canvas.onmouseup = function () {
+					_this.mousePressed = false;
+				}
+				this.canvas.onclick = function () {
+					if (z_dir(25 - _this.mouseX, 25 - _this.mouseY) < 12) {
+						if (_this._player.isPaused) {
+							_this._player.play();
+						} else {
+							_this._player.pause();
+						}
+					}
+				}
+				this.canvas.onmousemove = function (e) {
+					var df = _this.canvas.getBoundingClientRect();
+					_this.mouseX = e.clientX - df.left;
+					_this.mouseY = e.clientY - df.top;
+				}
+				this.canvas.width = 300;
+				this.canvas.height = 50;
+				this.interval = setInterval(this.step.bind(this), 5);
+			};
+			ATPlayer.prototype.step = function() {
+				this.ctx.clearRect(0, 0, this.canvas.width, 50);
+				this.ctx.beginPath();
+				this.ctx.lineCap = "round";
+				this.ctx.lineWidth = 50;
+				this.ctx.strokeStyle = "#f4f4f4";
+				this.ctx.moveTo(25, 25);
+				this.ctx.lineTo(this.canvas.width - 25, 25);
+				this.ctx.stroke();
+				if (z_dir(25 - this.mouseX, 25 - this.mouseY) < 12) {
+					this.ctx.beginPath();
+					this.ctx.lineCap = "round";
+					this.ctx.lineWidth = 25;
+					this.ctx.strokeStyle = "#ddd";
+					this.ctx.moveTo(25, 25);
+					this.ctx.lineTo(25, 25);
+					this.ctx.stroke();
+				}
+				this.ctx.beginPath();
+				this.ctx.fillStyle = "#000";
+				if (this._player.isPaused) {
+					this.ctx.moveTo(30, 25);
+					this.ctx.lineTo(20, 19);
+					this.ctx.lineTo(20, 31);
+				} else {
+					this.ctx.moveTo(20, 19);
+					this.ctx.lineTo(20, 31);
+					this.ctx.lineTo(23, 31);
+					this.ctx.lineTo(23, 19);
+					this.ctx.moveTo(27, 19);
+					this.ctx.lineTo(27, 31);
+					this.ctx.lineTo(30, 31);
+					this.ctx.lineTo(30, 19);
+				}
+				this.ctx.fill();
+				var VS1 = this.canvas.width - 100;
+				var VS2 = this.canvas.width - 50;
+				var GS1 = 125;
+				var GS2 = this.canvas.width - 48;
+				if (this.ToVolume > 0) {
+					GS2 = VS1 - 25;
+				}
+				if (this.ToVolume != 2 && (this.ToPlayAudio < 2)) {
+					if ((z_dir((VS2 + 25) - this.mouseX, 25 - this.mouseY) < 12) && this.ToVolume == 0) {
+						this.ToVolume = 1;
+					}
+					if (!cosiLINE(VS1, 25, ((VS2 + 25) - VS1), 12, this.mouseX, this.mouseY)) {
+						this.ToVolume = 0;
+					}
+				}
+				this.ctx.font = "13px Arial";
+				this.ctx.fillText(getDuraction(this._player.currentTime) + ' / ' + getDuraction(this._player.duration),45,30);
+				this.ctx.beginPath();
+				this.ctx.lineCap = "round";
+				this.ctx.lineWidth = 4;
+				this.ctx.strokeStyle = "#bbb";
+				this.ctx.moveTo(GS1, 25);
+				this.ctx.lineTo(GS2, 25);
+				this.ctx.stroke();
+				var duH1 = (this._player.currentTime / this._player.duration);
+				var duH2 = (this._player.getLoadedTime() / this._player.duration);
+				this.ctx.beginPath();
+				this.ctx.lineCap = "round";
+				this.ctx.lineWidth = 4;
+				this.ctx.strokeStyle = "#555";
+				this.ctx.moveTo(GS1, 25);
+				this.ctx.lineTo(GS1 + (duH2 * (GS2 - GS1)), 25);
+				this.ctx.stroke();
+				this.ctx.beginPath();
+				this.ctx.lineCap = "round";
+				this.ctx.lineWidth = 4;
+				this.ctx.strokeStyle = "#000";
+				this.ctx.moveTo(GS1, 25);
+				this.ctx.lineTo(GS1 + (duH1 * (GS2 - GS1)), 25);
+				this.ctx.stroke();
+				if ((this.ToPlayAudio < 2) && this.ToVolume !== 2) {
+					if (cosiLINE(GS1, 25, (GS2 - GS1), 8, this.mouseX, this.mouseY)) {
+						this.ToPlayAudio = 1;
+					} else {
+						this.ToPlayAudio = 0;
+					}
+				}
+				if (this.ToPlayAudio > 0) {
+					this.ctx.beginPath();
+					this.ctx.lineCap = "round";
+					this.ctx.lineWidth = 12;
+					this.ctx.strokeStyle = "#000";
+					this.ctx.moveTo(GS1 + (duH1 * (GS2 - GS1)), 25);
+					this.ctx.lineTo(GS1 + (duH1 * (GS2 - GS1)), 25);
+					this.ctx.stroke();
+				}
+				if (this.ToPlayAudio == 1 && this.mousePressed == true) {
+					this.ToPlayAudio = 2;
+					this._ToPlayAudioPaused = this._player.isPaused;
+					this._player.pause();
+				}
+				if (this.ToPlayAudio == 2) {
+					var AudioCurrentTime = (((this.mouseX - GS1) / (GS2 - GS1)) * this._player.duration);
+					if (AudioCurrentTime < 0) {
+						AudioCurrentTime = 0;
+					}
+					if (AudioCurrentTime > this._player.duration) {
+						AudioCurrentTime = this._player.duration;
+					}
+					this._player.setCurrentTime(AudioCurrentTime);
+					if (this.mousePressed == false) {
+						this.ToPlayAudio = 0;
+						if (this._ToPlayAudioPaused == false && this._player.currentTime != this._player.duration) this._player.play();
+					}
+				}
+				if (this.ToVolume > 0) {
+					var vuH1 = this._player.getVolume();
+					this.ctx.beginPath();
+					this.ctx.lineCap = "round";
+					this.ctx.lineWidth = 25;
+					this.ctx.strokeStyle = "#ddd";
+					this.ctx.moveTo(VS1, 25);
+					this.ctx.lineTo(VS2 + 25, 25);
+					this.ctx.stroke();
+					this.ctx.beginPath();
+					this.ctx.lineCap = "round";
+					this.ctx.lineWidth = 4;
+					this.ctx.strokeStyle = "#bbb";
+					this.ctx.moveTo(VS1, 25);
+					this.ctx.lineTo(VS2, 25);
+					this.ctx.stroke();
+					this.ctx.beginPath();
+					this.ctx.lineCap = "round";
+					this.ctx.lineWidth = 4;
+					this.ctx.strokeStyle = "#000";
+					this.ctx.moveTo(VS1, 25);
+					this.ctx.lineTo(VS1 + (vuH1 * (VS2 - VS1)), 25);
+					this.ctx.stroke();
+					if (cosiLINE(VS1, 25, (VS2 - VS1), 10, this.mouseX, this.mouseY) || this.ToVolume == 2) {
+						this.ctx.beginPath();
+						this.ctx.lineCap = "round";
+						this.ctx.lineWidth = 12;
+						this.ctx.strokeStyle = "#000";
+						this.ctx.moveTo(VS1 + (vuH1 * (VS2 - VS1)), 25);
+						this.ctx.lineTo(VS1 + (vuH1 * (VS2 - VS1)), 25);
+						this.ctx.stroke();
+						if (this.mousePressed && this.ToVolume !== 2) this.ToVolume = 2;
+					}
+					if (this.ToVolume == 2) {
+						var AudioVolume = (((this.mouseX - VS1) / (VS2 - VS1)));
+						if (AudioVolume < 0) {
+							AudioVolume = 0;
+						}
+						if (AudioVolume > 1) {
+							AudioVolume = 1;
+						}
+						this._player.setVolume(AudioVolume);
+						if (this.mousePressed == false) this.ToVolume = 1;
+					}
+				}
+				if (this._player.getVolume() > 0) {
+					this.ctx.drawImage(this.volumeimg, VS2 + 18,18,15,15);
+				} else {
+					this.ctx.drawImage(this.volumeoffimg, VS2 + 18,18,15,15);
+				}
+			};
+			ATPlayer.prototype.loadAudio = function(data) {
+				this._player.loadAudio(data);
+				if (this.autoPlay) {
+					this._player.play();
+				}
+			};
+			var atp = new ATPlayer();
+			atp.init(document.getElementById('audiocontextcontrol'));
+			function loadMidiFile(file) {
+				var a = new FileReader();
+				a.onload = (function() {
+					setTimeout(function () {
+						atp.loadAudio(a.result);
+					}, 2);
+				}).bind(this);
+				a.readAsArrayBuffer(file);
+			}
+			var loadmidifile = document.getElementById('loadmidifile');
+			function dropHandler(ev) {
+				ev.preventDefault();
+				if (ev.dataTransfer.items) {
+					[...ev.dataTransfer.items].forEach((item, i) => {
+					if (item.kind === 'file') {
+						const file = item.getAsFile();
+						loadMidiFile(file);
+					}
+					});
+				}
+			}
+			function dragOverHandler(ev) {
+				ev.preventDefault();
+			}
+			loadmidifile.onclick = function () {
+				var sa = document.createElement('input');
+				sa.type = 'file';
+				sa.accept = '.wav, .mp3';
+				sa.addEventListener('change', function (e) {
+					var file = e.target.files[0];
+					loadMidiFile(file);
+				}, false);
+				sa.click();
+			}
+		</script>
+	</body>
+</html>

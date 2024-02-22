@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Sound Decoder Engine</title>
+		<style>
+			body{
+				font-family: sans-serif;
+				margin: 0;
+				padding: 0;
+			}
+			label{
+				color: #fff;
+			}
+			.hfgfhh {
+				background-color: #111;
+				width: 100%;
+				height: 100%;
+				position: absolute;
+			}
+			.playerr{
+				background: #999;
+				margin: 0;
+				padding: 10px;
+				border-radius: 10px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+			.dgdggggg{
+				position: absolute;
+				bottom: 15px;
+				left: 50%;
+				transform: translate(-50%, 0%);
+			}
+			.dgdggggg a{
+				padding: 6px 6px;
+				border-radius: 15px;
+				background-color: azure;
+				color: black;
+				text-decoration-line: none;
+			}
+			.dgdggggg a:hover{
+				background-color: blue;
+				color: rgb(255, 255, 255);
+			}
+		</style>
+	</head>
+	<body id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+		<div class="hfgfhh">
+			<div class="playerr">
+				<button id="loadmidifile">Load Audio</button>
+				<button id="playstop">Play</button>
+				<button id="sstop">Stop</button>
+				<button id="sautoplay">AutoPlay: Off</button>
+				<button id="sloop">Loop: Off</button>
+				<button id="dddwave">Download WAV</button>
+				<label>volume:</label>
+				<input type="range" id="vol5" value="100" min="0" max="100" style="width: 90px;">
+				<br>
+				<canvas id="ccc" width="640" height="360"></canvas>
+			</div>
+			<div class="dgdggggg">
+				<a href="player.html">Player</a>
+				<a href="about.html">About</a>
+			</div>
+		</div>
+		<script src="atsounddecoderengine.js"></script>
+		<script>
+			var MAX3 = 5000;
+			var MAX4 = 5000;
+			var positionX = 0;
+			var positionY = 0;
+			var cameraTime = 0;
+			var cameraZoom = 500;
+
+			var Whe = 45;
+
+			var showtitle = false;
+
+			var message33 = '';
+			var TITLE = '';
+			var MDATE = "";
+			var sautoplay = document.getElementById('sautoplay');
+			var sloop = document.getElementById('sloop');
+			var fgdgdfg2 = document.getElementById("vol5");
+			var sstop = document.getElementById('sstop');
+			var dddwave = document.getElementById('dddwave');
+			var controlss = [false, false];
+			var titleAn = [4, '', 0, 0, 0];
+			var cc = document.getElementById('ccc');
+			var ctx = cc.getContext("2d");
+			var player = new ATSoundDecoderEngine.Player();
+			fgdgdfg2.addEventListener('input', function() {
+				player.setVolume(fgdgdfg2.value / 100);
+			}, false);
+			function loadMidiFile(file) {
+				TITLE = file.name;
+				MDATE = file.lastModifiedDate.getDate() + '/' + (file.lastModifiedDate.getMonth() + 1) + '/' + file.lastModifiedDate.getFullYear();
+				var a = new FileReader();
+				a.onload = (function() {
+					playstop.innerHTML = 'Play';
+					setTimeout(function () {
+						player.loadAudio(a.result);
+						message33 = '';
+						titleAn[0] = 0;
+						if (controlss[0]) {
+							playstop.innerHTML = 'Pause';
+							player.play();
+						}
+					}, 2);
+				}).bind(this);
+				a.readAsArrayBuffer(file);
+			}
+			var loadmidifile = document.getElementById('loadmidifile');
+			function dropHandler(ev) {
+				ev.preventDefault();
+				if (ev.dataTransfer.items) {
+					[...ev.dataTransfer.items].forEach((item, i) => {
+					if (item.kind === 'file') {
+						const file = item.getAsFile();
+						loadMidiFile(file);
+					}
+					});
+				}
+			}
+			function dragOverHandler(ev) {
+				ev.preventDefault();
+			}
+			loadmidifile.onclick = function () {
+				var sa = document.createElement('input');
+				sa.type = 'file';
+				sa.accept = '.wav,.mp3';
+				sa.addEventListener('change', function (e) {
+					var file = e.target.files[0];
+					loadMidiFile(file);
+				}, false);
+				sa.click();
+			}
+			player.onended = function () {
+				if (controlss[1]) {
+					player.play();
+				} else {
+					playstop.innerHTML = 'Play';
+				}
+			}
+			sautoplay.onclick = function() {
+				if (controlss[0]) {
+					sautoplay.innerHTML = 'AutoPlay: Off';
+					controlss[0] = false;
+				} else {
+					sautoplay.innerHTML = 'AutoPlay: On';
+					controlss[0] = true;
+				}
+			}
+			sloop.onclick = function() {
+				if (controlss[1]) {
+					sloop.innerHTML = 'Loop: Off';
+					controlss[1] = false;
+				} else {
+					sloop.innerHTML = 'Loop: On';
+					controlss[1] = true;
+				}
+			}
+			playstop.onclick = function () {
+				if (player.isPaused) {
+					playstop.innerHTML = 'Pause';
+					player.play();
+				} else {
+					playstop.innerHTML = 'Play';
+					player.pause();
+				}
+			}
+			sstop.onclick = function() {
+				playstop.innerHTML = 'Play';
+				player.stop();
+			}
+			cc.onmousemove = function(e) {
+				var df = cc.getBoundingClientRect();
+				positionX = e.clientX - df.left;
+				positionY = e.clientY - df.top;
+			}
+			cc.onmousedown = function(e) {
+				e.preventDefault();
+				if (positionY < Whe) {
+					player.setCurrentTime((positionX / cc.width) * player.duration);
+				}
+			}
+			cc.onmouseup = function(e) {
+				e.preventDefault();
+			}
+			function mod(x, y) {
+				var r = x % y;
+				if (r / y < 0) {
+					r += y;
+				}
+				return r; 
+			};
+			function getByte(b) {
+				if (b >= 1000000) {
+					return (Math.floor(b / 100000) / 10) + " MB";
+				} else {
+					if (b >= 1000) {
+						return Math.floor(b / 1000) + " KB";
+					} else {
+						return b + " B";
+					}
+				}
+			}
+			function getDuraction(num) {
+				var txt = '';
+				if (Math.floor(num) >= 3600) {
+					txt += '' + Math.floor(num / 3600);
+					txt += ':';
+					if (mod(Math.floor(num / 60), 60) >= 10) {
+						txt += '' + mod(Math.floor(num / 60), 60);
+					} else {
+						txt += '0' + mod(Math.floor(num / 60), 60);
+					}
+					txt += ':';
+					if (mod(Math.floor(num), 60) >= 10) {
+						txt += '' + mod(Math.floor(num), 60);
+					} else {
+						txt += '0' + mod(Math.floor(num), 60);
+					}
+				} else {
+					txt += '' + mod(Math.floor(num / 60), 60);
+					txt += ':';
+					if (mod(Math.floor(num), 60) >= 10) {
+						txt += '' + mod(Math.floor(num), 60);
+					} else {
+						txt += '0' + mod(Math.floor(num), 60);
+					}
+				}
+				return txt;
+			}
+			var int16view = new Int16Array(1);
+			var int32view = new Int32Array(1);
+			function GGint8(data, pos, cc) {
+				var fixval = (cc | 0) % 0x100;
+				data[pos] = fixval;
+			}
+			function GGint16(data, pos, cc) {
+				var fixval = (cc | 0) % 0x10000;
+				data[pos] = fixval % 256;
+				data[pos + 1] = Math.floor(fixval / 256);
+			}
+			function GGint32(data, pos, cc) {
+				var fixval = (cc | 0) % 0x100000000;
+				data[pos] = fixval % 256;
+				data[pos + 1] = Math.floor(fixval / 256);
+				data[pos + 2] = Math.floor(fixval / 0x10000);
+				data[pos + 3] = Math.floor(fixval / 0x1000000);
+			}
+			function Grint16(data, pos) {
+				var val = (data[pos] + (data[pos + 1] * 256));
+				return (val > 32767) ? (val - 0x10000) : val;
+			}
+			function downloadWAV() {
+				var rate = player.rate;
+				var sampleCount = Math.floor((player.sampleCount / rate) * 22050);
+				var wavData = new Uint8Array(36 + (8 + (1 * sampleCount)));
+				wavData[0] = 82;
+				wavData[1] = 73;
+				wavData[2] = 70;
+				wavData[3] = 70;
+				GGint32(wavData, 4, (1 * sampleCount) + 36); // total size (excluding 8-byte RIFF header)
+				wavData[8] = 87;
+				wavData[9] = 65;
+				wavData[10] = 86;
+				wavData[11] = 69;
+				// format chunk
+				wavData[12] = 102;
+				wavData[13] = 109;
+				wavData[14] = 116;
+				wavData[15] = 32;
+				GGint32(wavData, 16, 16); // format chunk size
+				GGint16(wavData, 20, 1); // encoding; 1 = PCM
+				GGint16(wavData, 22, 1); // channels; 1 = mono
+				GGint32(wavData, 24, 22050); // samplesPerSecond
+				GGint32(wavData, 28, 22050 * 1); // bytesPerSecond
+				GGint16(wavData, 32, 2); // blockAlignment
+				GGint16(wavData, 34, 8); // bitsPerSample
+				// data chunk
+				wavData[36] = 100;
+				wavData[37] = 97;
+				wavData[38] = 116;
+				wavData[39] = 97;
+				GGint32(wavData, 40, (1 * sampleCount)); // format chunk size
+				var _left = null;
+				var _right = null;
+				_left = player.buffer.getChannelData(0);
+				if (player.isEstreno) {
+					_right = player.buffer.getChannelData(1);
+				}
+				for (var i = 0; i < player.sampleCount; i++) {
+					var id = Math.floor((i / player.sampleCount) * sampleCount);
+					var l = 0;
+					if (_right) {
+						l = (_left[i] + _right[i]) / 2;
+					} else {
+						l = _left[i];
+					}
+					wavData[id + 44] = Math.round((l * 120)) + 128;
+				}
+				var bb = new Blob([wavData]);
+				var aaa = document.createElement('a');
+				aaa.href = URL.createObjectURL(bb);
+				aaa.download = 'atsounddecoder' + wavData.length + '.wav';
+				aaa.click();
+			}
+			dddwave.onclick = function() {
+				downloadWAV();
+			}
+			setInterval(function () {
+				var isCo = positionY < Whe;
+				var spee = (1200);
+				cameraZoom = 1;
+				cameraTime = 0;
+				ctx.lineWidth = 1;
+				ctx.clearRect(0,0,cc.width,cc.height);
+				ctx.fillStyle = "#000";
+				ctx.beginPath();
+				ctx.rect(0,0, cc.width, cc.height);
+				ctx.fill();
+				MAX4 = cc.width / 2;
+				if (player.buffer) {
+					var _left = null;
+					var _right = null;
+					_left = player.buffer.getChannelData(0);
+					if (player.isEstreno) {
+						_right = player.buffer.getChannelData(1);
+					}
+					var dfgdfg = Math.floor((player.currentTime / player.duration) * player.sampleCount);
+					ctx.lineWidth = 2;
+					var Hmfmg = (cc.height - Whe);
+					ctx.beginPath();
+					ctx.moveTo(-5, Whe + (Hmfmg/2));
+					ctx.strokeStyle = "#fff";
+					if (player.isEstreno) {
+						ctx.moveTo(-5,Whe + (Hmfmg/2));
+						for (var i = 0; i < MAX4; i++) {
+							var s1 = Math.floor(((i / MAX4) * ((player.rate / 41000) *  spee)) + dfgdfg);
+							if (s1 >= player.sampleCount) break;
+							ctx.lineTo((i / MAX4) * cc.width, Whe + (((_left[s1] + 1) / 2) * (Hmfmg/2)));
+						}
+						ctx.moveTo(-5,Whe + (Hmfmg/2));
+						for (var i = 0; i < MAX4; i++) {
+							var s2 = ((Math.floor(((i) / MAX4) * ((player.rate / 41000) * spee)) + dfgdfg));
+							if (s2 >= player.sampleCount) break;
+							ctx.lineTo((i / MAX4) * cc.width, Whe + (((_right[s2] + 1) / 2) * (Hmfmg/2) + (Hmfmg/2)));
+						}
+					} else {
+						for (var i = 0; i < MAX4; i++) {
+							if ((Math.floor((i / MAX4) * ((player.rate / 41000) *  spee)) + dfgdfg) >= player.sampleCount) break;
+							ctx.lineTo((i / MAX4) * cc.width, Whe + (((_left[(Math.floor((i / MAX4) * ((player.rate / 41000) *  spee)) + dfgdfg)] + 1) / 2) * Hmfmg));
+						}
+					}
+					ctx.stroke();
+					if (true) {
+						ctx.lineWidth = 1;
+						ctx.beginPath();
+						ctx.fillStyle = "#444";
+						var rr = (player.getLoadedTime() / player.duration) * cc.width;
+						ctx.rect(rr, 0, cc.width - rr, Whe);
+						ctx.fill();
+
+						ctx.strokeStyle = "#444";
+						ctx.beginPath();
+						ctx.moveTo(-5,(Whe/2));
+						if (player.isEstreno) {
+							for (var i = 0; i < MAX3; i++) {
+								var xw = (i / MAX3);
+								var s1 = (Math.floor(((xw * player.sampleCount) + cameraTime) / cameraZoom));
+								if ((xw * player.duration) > player.getLoadedTime()) break;
+								ctx.lineTo(xw * cc.width, ((_left[s1] + 1) / 2) * (Whe/2));
+							}
+							ctx.moveTo(-5,(Whe/2));
+							for (var i = 0; i < MAX3; i++) {
+								var xw = (i / MAX3);
+								var s2 = (Math.floor(((xw * player.sampleCount) + cameraTime) / cameraZoom));
+								if ((xw * player.duration) > player.getLoadedTime()) break;
+								ctx.lineTo(xw * cc.width, ((_right[s2] + 1) / 2) * (Whe/2) + (Whe/2));
+							}
+						} else {
+							for (var i = 0; i < MAX3; i++) {
+								var xw = (i / MAX3);
+								if ((xw * player.duration) > player.getLoadedTime()) break;
+								ctx.lineTo(xw * cc.width, ((_left[(Math.floor(((xw * player.sampleCount) - cameraTime) * cameraZoom))] + 1) / 2) * Whe);
+							}
+						}
+						ctx.stroke();
+					}
+				}
+				ctx.beginPath();
+				ctx.lineWidth = 1;
+				ctx.strokeStyle = "#f00";
+				ctx.moveTo((Math.floor((((((player.currentTime * player.rate) - (cameraTime / cameraZoom)) / player.sampleCount)) * cameraZoom) * cc.width)), 0);
+				ctx.lineTo((Math.floor((((((player.currentTime * player.rate) - (cameraTime / cameraZoom)) / player.sampleCount)) * cameraZoom) * cc.width)), Whe);
+				ctx.stroke();
+				if (isCo) {
+					var mxct = positionX / cc.width;
+					ctx.lineWidth = 1;
+					ctx.beginPath();
+					ctx.strokeStyle = "#0f0";
+					ctx.moveTo((Math.floor(mxct * cc.width)), 0);
+					ctx.lineTo((Math.floor(mxct * cc.width)), Whe);
+					ctx.stroke();
+					ctx.fillStyle = "#0f0";
+					var isR = (positionX > (cc.width - 50));
+					if (isR) {
+						ctx.textAlign = "right";
+					} else {
+						ctx.textAlign = "left";
+					}
+					ctx.fillText(getDuraction(mxct * player.duration), (Math.floor(mxct * cc.width)) + (isR ? -2 : 2), 10);
+				}
+				if (true) {
+					ctx.fillStyle = "#fff";
+					ctx.textAlign = "left";
+					var YSY = '';
+					YSY += 'TIME: ' + getDuraction(player.currentTime) + '/' + getDuraction(player.duration);
+					YSY += ' RATE: ' + player.rate;
+					YSY += ' SAMPLE COUNT: ' + player.sampleCount;
+					YSY += ' TYPE: ' + player.getType();
+					ctx.fillText(YSY, 0, Whe + 10);
+				}
+				if (titleAn[0] == 0) {
+					titleAn[0] = 1;
+					titleAn[1] = "";
+				}
+				if (titleAn[0] == 1) {
+					if (TITLE.length == titleAn[1].length) {
+						titleAn[0] = 2;
+						titleAn[3] = 0;
+					} else {
+						if ((titleAn[3] % 3) == 2) {
+							var ddd = TITLE[titleAn[1].length];
+							titleAn[1] += ddd;
+						}
+					}
+					titleAn[3] += 1;
+				}
+				if (titleAn[0] == 2) {
+					if ((titleAn[3] % 3) == 2) {
+						var lll = '';
+						for (var i = 1; i < titleAn[1].length; i++) {
+							lll += titleAn[1][i];
+						}
+						lll += titleAn[1][0];
+						titleAn[1] = lll;
+					}
+					if ((titleAn[3] / 3) > titleAn[1].length) {
+						titleAn[0] = 3;
+						titleAn[2] = Date.now();
+					}
+					titleAn[3] += 1;
+				}
+				if (titleAn[0] == 3) {
+					if ((Date.now() - titleAn[2]) > 1000) {
+						titleAn[0] = 4;
+						titleAn[3] = 0;
+					}
+				}
+				if (titleAn[0] == 4) {
+					if ((titleAn[3] % 2) == 1) {
+						var lll = '';
+						for (var i = 1; i < titleAn[1].length; i++) {
+							lll += titleAn[1][i];
+						}
+						titleAn[1] = lll;
+					}
+					if (0 == titleAn[1].length) {
+						titleAn[0] = 5;
+					}
+					titleAn[3] += 1;
+				}
+				if (titleAn[0] == 5) {
+					titleAn[1] = "";
+				}
+				ctx.textAlign = "center";
+				ctx.fillStyle = "#fff";
+				ctx.fillStyle = "#fff";
+				if (showtitle) ctx.fillText(titleAn[1], cc.width/2, cc.height - 20);
+			}, 1000 / 60);
+		</script>
+	</body>
+</html>
