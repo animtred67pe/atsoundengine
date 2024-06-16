@@ -120,24 +120,15 @@ var ATSoundDecoderEngine = (function() {
 	}
 	WAVStreamDecoder.STEP_TABLE = [7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658, 724, 796, 876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358, 5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899, 15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767];
 	WAVStreamDecoder.INDEX_TABLE = [-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8];
-	WAVStreamDecoder.DELTA_TABLE = (function () {
-		const NUM_STEPS = WAVStreamDecoder.STEP_TABLE.length;
-		const NUM_INDICES = WAVStreamDecoder.INDEX_TABLE.length;
-		var _deltaTable = new Array(NUM_STEPS * NUM_INDICES).fill(0);
-		let i = 0;
-		for (let index = 0; index < NUM_STEPS; index++) {
-			for (let code = 0; code < NUM_INDICES; code++) {
-				const step = WAVStreamDecoder.STEP_TABLE[index];
-				let delta = 0;
-				if (code & 4) delta += step;
-				if (code & 2) delta += step >> 1;
-				if (code & 1) delta += step >> 2;
-				delta += step >> 3;
-				_deltaTable[i++] = (code & 8) ? -delta : delta;
-			}
-		}
-		return _deltaTable;
-	}());
+	WAVStreamDecoder.deltaDecoder = function(index, code) {
+		const step = WAVStreamDecoder.STEP_TABLE[index];
+		let delta = 0;
+		if (code & 4) delta += step;
+		if (code & 2) delta += step >> 1;
+		if (code & 1) delta += step >> 2;
+		delta += step >> 3;
+		return (code & 8) ? -delta : delta;
+	}
 	WAVStreamDecoder.prototype.start = function() {
 		var stream = this.stream;
 		stream.littleEndian = true;
@@ -343,32 +334,49 @@ var ATSoundDecoderEngine = (function() {
 		var compressedData = this.compressedData;
         const size = this.sampleLength;
         const samplesAfterBlockHeader = (this.adpcmBlockSize - 4) * 2;
-		var lastByte = -1;
-		var sample = compressedData.readShort();
-		var index = compressedData.readUnsignedByte();
-		compressedData.position++;
-		if (index > 88) index = 88;
-		this.writeSample(0, this.sampleIndex++, sample / 32768);
-		const blockLength = Math.min(samplesAfterBlockHeader, size - this.sampleIndex);
-		const blockStart = this.sampleIndex;
-        var code;
-		while (this.sampleIndex - blockStart < blockLength) {
-			if (lastByte < 0) {
-			    lastByte = compressedData.readUnsignedByte();
-			    code = lastByte & 0xF;
-			} else {
-			    code = (lastByte >> 4) & 0xF;
-			    lastByte = -1;
-			}
-			var delta = WAVStreamDecoder.DELTA_TABLE[index * 16 + code];
-			index += WAVStreamDecoder.INDEX_TABLE[code];
+        if (this.channels == 2) {
+        	var chan = [{sample: 0, index: 0, lastByte: 0}, {sample: 0, index: 0, lastByte: 0}];
+        	chan[0].lastByte = -1;
+        	chan[1].lastByte = -1;
+        	chan[0].sample = compressedData.readShort();
+        	chan[1].sample = compressedData.readShort();
+        	chan[0].index = compressedData.readUnsignedByte();
+        	chan[1].index = compressedData.readUnsignedByte();
+			compressedData.position++;
+			compressedData.position++;
+			if (chan[1].index > 88) chan[1].index = 88;
+			if (chan[1].index > 88) chan[1].index = 88;
+
+			
+
+        } else {
+        	var lastByte = -1;
+			var sample = compressedData.readShort();
+			var index = compressedData.readUnsignedByte();
+			compressedData.position++;
 			if (index > 88) index = 88;
-			if (index < 0) index = 0;
-			sample += delta;
-			if (sample > 32767) sample = 32767;
-			if (sample < -32768) sample = -32768;
 			this.writeSample(0, this.sampleIndex++, sample / 32768);
-		}
+			const blockLength = Math.min(samplesAfterBlockHeader, size - this.sampleIndex);
+			const blockStart = this.sampleIndex;
+	        var code;
+			while (this.sampleIndex - blockStart < blockLength) {
+				if (lastByte < 0) {
+				    lastByte = compressedData.readUnsignedByte();
+				    code = lastByte & 0xF;
+				} else {
+				    code = (lastByte >> 4) & 0xF;
+				    lastByte = -1;
+				}
+				var delta = WAVStreamDecoder.deltaDecoder(index, code);
+				index += WAVStreamDecoder.INDEX_TABLE[code];
+				if (index > 88) index = 88;
+				if (index < 0) index = 0;
+				sample += delta;
+				if (sample > 32767) sample = 32767;
+				if (sample < -32768) sample = -32768;
+				this.writeSample(0, this.sampleIndex++, sample / 32768);
+			}
+        }
 	};
 	function util_len(v) {
 		if (typeof(v) === 'object') return v.length;
@@ -1499,6 +1507,9 @@ var ATSoundDecoderEngine = (function() {
 			}
 		    frameStarts.push(this.stream.position);
 		    var eeee = (result.frameSize() - 4);
+			if (!((this.stream.getBytesAvailable() - eeee) > 4)) {
+				break;
+			}
 		    frameCount += 1;
 			this.stream.position += eeee;
 		}
