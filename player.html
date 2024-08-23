@@ -3,12 +3,16 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Sound Decoder Engine</title>
+		<title>Anim Tred Sound Engine Player</title>
 		<style>
 			body {
 				margin: 0;
 				overflow: hidden;
 				font-family: monospace;
+				color: #fff;
+			}
+			a {
+				color: #fff;
 			}
 			.hfgfhh {
 				background-color: #000;
@@ -24,22 +28,18 @@
 			}
 		</style>
 	</head>
-	<body id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+	<body>
 		<div class="hfgfhh">
 			<div id="audiocontextcontrol"></div>
 			<div style="background-color: #000; padding: 5px 6px; position: absolute; top: 5px; left: 5px;">
-				<a href="#" id="loadmidifile" style="color: #fff;">Open Audio</a>
+				<a href="#" id="loadmidifile">Open Audio</a>
+				<label id="midifiletitle"></label>
+				<br>
+				<label id="midifiletitle2"></label>
 			</div>
 		</div>
 		<script src="atsounddecoderengine.js"></script>
 		<script>
-			function mod(x, y) {
-				var r = x % y;
-				if (r / y < 0) {
-				r += y;
-				}
-				return r; 
-			};
 			function getDuraction(num) {
 				var txt = '';
 				if (Math.floor(num) > 3599) {
@@ -274,12 +274,8 @@
 					}
 					if (this.ToVolume == 2) {
 						var AudioVolume = (((this.mouseX - VS1) / (VS2 - VS1)));
-						if (AudioVolume < 0) {
-							AudioVolume = 0;
-						}
-						if (AudioVolume > 1) {
-							AudioVolume = 1;
-						}
+						if (AudioVolume < 0) AudioVolume = 0;
+						if (AudioVolume > 1) AudioVolume = 1;
 						this._player.setVolume(AudioVolume);
 						if (this.mousePressed == false) this.ToVolume = 1;
 					}
@@ -289,33 +285,41 @@
 				} else {
 					this.ctx.drawImage(this.volumeoffimg, VS2 + 18,18,15,15);
 				}
+				if (this.midistats) {
+					var YSY = '';
+					YSY += 'Rate: ' + this._player.rate;
+					YSY += ' Sample Count: ' + this._player.sampleCount;
+					YSY += ' Type: ' + this._player.getType();
+					this.midistats.textContent = YSY;
+				}
 			};
 			ATPlayer.prototype.loadAudio = function(data) {
 				this._player.loadAudio(data);
-				if (this.autoPlay) {
-					this._player.play();
-				}
+				if (this.autoPlay) this._player.play();
 			};
 			var atp = new ATPlayer();
+			atp.midistats = document.getElementById('midifiletitle2');
 			atp.init(document.getElementById('audiocontextcontrol'));
 			function loadMidiFile(file) {
 				var a = new FileReader();
 				a.onload = (function() {
 					setTimeout(function () {
+						midifiletitle.textContent = file.name;
 						atp.loadAudio(a.result);
 					}, 2);
 				}).bind(this);
 				a.readAsArrayBuffer(file);
 			}
 			var loadmidifile = document.getElementById('loadmidifile');
+			var midifiletitle = document.getElementById('midifiletitle');
 			function dropHandler(ev) {
 				ev.preventDefault();
 				if (ev.dataTransfer.items) {
 					[...ev.dataTransfer.items].forEach((item, i) => {
-					if (item.kind === 'file') {
-						const file = item.getAsFile();
-						loadMidiFile(file);
-					}
+						if (item.kind === 'file') {
+							const file = item.getAsFile();
+							loadMidiFile(file);
+						}
 					});
 				}
 			}
@@ -325,7 +329,7 @@
 			loadmidifile.onclick = function () {
 				var sa = document.createElement('input');
 				sa.type = 'file';
-				sa.accept = '.wav, .mp3';
+				sa.accept = '.wav, .mp3, .dat';
 				sa.addEventListener('change', function (e) {
 					var file = e.target.files[0];
 					loadMidiFile(file);

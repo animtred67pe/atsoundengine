@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Sound Decoder Engine</title>
+		<title>Anim Tred Sound Engine</title>
 		<style>
 			body{
 				font-family: monospace;
@@ -11,15 +11,15 @@
 				padding: 0;
 			}
 			label{
-				color: #fff;
+				color: #ddd;
 			}
 			a{
-				color: #fff;
+				color: #ddd;
 				text-decoration-line: underline;
 				cursor: pointer;
 			}
 			.hfgfhh {
-				background-color: #000;
+				background-color: #111;
 				width: 100%;
 				height: 100%;
 				position: absolute;
@@ -41,30 +41,29 @@
 			}
 			.dgdggggg a{
 				padding: 6px 6px;
-				border: 2px solid #fff;
+				border: 2px solid #ddd;
 				border-radius: 15px;
-				color: #fff;
+				color: #ddd;
 				text-decoration-line: none;
+				transition: 0.2s;
 			}
 			.dgdggggg a:hover{
-				background-color: #fff;
-				color: rgb(0, 0, 0);
+				background-color: #ddd;
+				color: #111;
 			}
 		</style>
 	</head>
-	<body id="drop_zone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+	<body>
 		<div class="hfgfhh">
 			<div class="playerr">
 				<a id="loadmidifile">Load Audio</a>
 				<a id="playstop">Play</a>
 				<a id="sstop">Stop</a>
-				<a id="sautoplay">AutoPlay: Off</a>
-				<a id="sloop">Loop: Off</a>
 				<a id="dddwave" title="Convert WAV with 8-bit, 22050 sample">Convert WAV</a>
 				<label>volume:</label>
-				<input type="range" id="vol5" value="100" min="0" max="100" style="width: 160px;">
+				<input type="range" id="vol5" value="100" min="0" max="100" style="width: 100px;">
 				<br>
-				<canvas id="ccc" style="border: 2px solid #fff;" width="640" height="360"></canvas>
+				<canvas id="ccc" width="640" height="360"></canvas>
 			</div>
 			<div class="dgdggggg">
 				<a href="player.html">Player</a>
@@ -74,7 +73,7 @@
 		<script src="atsounddecoderengine.js"></script>
 		<script>
 			var MAX3 = 5000;
-			var MAX4 = 5000;
+			var MAX4 = 0;
 			var positionX = 0;
 			var positionY = 0;
 			var cameraTime = 0;
@@ -87,8 +86,6 @@
 			var message33 = '';
 			var TITLE = '';
 			var MDATE = "";
-			var sautoplay = document.getElementById('sautoplay');
-			var sloop = document.getElementById('sloop');
 			var fgdgdfg2 = document.getElementById("vol5");
 			var sstop = document.getElementById('sstop');
 			var dddwave = document.getElementById('dddwave');
@@ -96,6 +93,10 @@
 			var titleAn = [4, '', 0, 0, 0];
 			var cc = document.getElementById('ccc');
 			var ctx = cc.getContext("2d");
+
+			var cDat = document.createElement("canvas");
+			var ctxDat = cDat.getContext("2d");
+
 			var player = new ATSoundDecoderEngine.Player();
 			fgdgdfg2.addEventListener('input', function() {
 				player.setVolume(fgdgdfg2.value / 100);
@@ -148,24 +149,6 @@
 					player.play();
 				} else {
 					playstop.innerHTML = 'Play';
-				}
-			}
-			sautoplay.onclick = function() {
-				if (controlss[0]) {
-					sautoplay.innerHTML = 'AutoPlay: Off';
-					controlss[0] = false;
-				} else {
-					sautoplay.innerHTML = 'AutoPlay: On';
-					controlss[0] = true;
-				}
-			}
-			sloop.onclick = function() {
-				if (controlss[1]) {
-					sloop.innerHTML = 'Loop: Off';
-					controlss[1] = false;
-				} else {
-					sloop.innerHTML = 'Loop: On';
-					controlss[1] = true;
 				}
 			}
 			playstop.onclick = function () {
@@ -318,6 +301,14 @@
 			dddwave.onclick = function() {
 				downloadWAV();
 			}
+			var HHHSwidth = (cc.width / 1) | 0;
+			var HHHSheight = (cc.height / 1) | 0;
+			cDat.width = HHHSwidth;
+			cDat.height = HHHSheight;
+			var gdfgdfg = ctx.createImageData(HHHSwidth, HHHSheight);
+			var gdfgdfgData = gdfgdfg.data;
+			var hjgfh = new Int16Array(65535);
+			var gfhgfhfhfgI = 0;
 			setInterval(function () {
 				var isCo = positionY < Whe;
 				var spee = (1200);
@@ -329,8 +320,9 @@
 				ctx.beginPath();
 				ctx.rect(0,0, cc.width, cc.height);
 				ctx.fill();
-				MAX4 = cc.width / 2;
+				MAX4 = cc.width;
 				if (player.buffer) {
+					gfhgfhfhfgI = 0;
 					var _left = null;
 					var _right = null;
 					_left = player.buffer.getChannelData(0);
@@ -338,31 +330,59 @@
 						_right = player.buffer.getChannelData(1);
 					}
 					var dfgdfg = Math.floor((player.currentTime / player.duration) * player.sampleCount);
-					ctx.lineWidth = 2;
+					ctx.lineWidth = 1;
 					var Hmfmg = (cc.height - Whe);
-					ctx.beginPath();
-					ctx.moveTo(-5, Whe + (Hmfmg/2));
-					ctx.strokeStyle = "#fff";
 					if (player.isEstreno) {
-						ctx.moveTo(-5,Whe + (Hmfmg/2));
 						for (var i = 0; i < MAX4; i++) {
-							var s1 = Math.floor(((i / MAX4) * ((player.rate / 41000) *  spee)) + dfgdfg);
-							if (s1 >= player.sampleCount) break;
-							ctx.lineTo((i / MAX4) * cc.width, Whe + (((_left[s1] + 1) / 2) * (Hmfmg/2)));
+							var s1 = Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg;
+							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_left[s1] || 0) + 1) / 2) * (Hmfmg / 2))) | 0;
 						}
-						ctx.moveTo(-5,Whe + (Hmfmg/2));
 						for (var i = 0; i < MAX4; i++) {
-							var s2 = ((Math.floor(((i) / MAX4) * ((player.rate / 41000) * spee)) + dfgdfg));
-							if (s2 >= player.sampleCount) break;
-							ctx.lineTo((i / MAX4) * cc.width, Whe + (((_right[s2] + 1) / 2) * (Hmfmg/2) + (Hmfmg/2)));
+							var s2 = Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg;
+							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_right[s2] || 0) + 1) / 2) * (Hmfmg / 2) + (Hmfmg / 2))) | 0;
 						}
 					} else {
 						for (var i = 0; i < MAX4; i++) {
-							if ((Math.floor((i / MAX4) * ((player.rate / 41000) *  spee)) + dfgdfg) >= player.sampleCount) break;
-							ctx.lineTo((i / MAX4) * cc.width, Whe + (((_left[(Math.floor((i / MAX4) * ((player.rate / 41000) *  spee)) + dfgdfg)] + 1) / 2) * Hmfmg));
+							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_left[Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg] || 0) + 1) / 2) * Hmfmg)) | 0;
 						}
 					}
-					ctx.stroke();
+					var ghgjjgh = gfhgfhfhfgI;
+					gfhgfhfhfgI = 0;
+					var lastY = 0;
+					while(gfhgfhfhfgI < ghgjjgh) {
+						var dgd = hjgfh[gfhgfhfhfgI++];
+						var gcount = Math.max(1, Math.abs(dgd - lastY));
+						var xh1 = ((gfhgfhfhfgI - 1) % 640) | 0;
+						for (var i = 0; i < gcount; i++) {
+							var yh1 = (lastY + (i * (Math.max(-1, Math.min(1, (dgd - lastY))) || 0))) | 0;
+							var hfgh = (xh1 + (Math.max(0, Math.min(HHHSheight, yh1)) * HHHSwidth)) * 4;
+							gdfgdfgData[hfgh + 0] = 255;
+							gdfgdfgData[hfgh + 1] = 255;
+							gdfgdfgData[hfgh + 2] = 255;
+							gdfgdfgData[hfgh + 3] = 255;
+						}
+						lastY = dgd;
+					}
+					ctxDat.clearRect(0,0,cDat.width, cDat.height);
+					ctxDat.putImageData(gdfgdfg, 0, 0);
+					ctx.imageSmoothingEnabled = false;
+					ctx.drawImage(cDat, 0, 0, cc.width, cc.height);
+					gfhgfhfhfgI = 0;
+					lastY = 0;
+					while(gfhgfhfhfgI < ghgjjgh) {
+						var dgd = hjgfh[gfhgfhfhfgI++];
+						var gcount = Math.max(1, Math.abs(dgd - lastY));
+						var xh1 = ((gfhgfhfhfgI - 1) % 640) | 0;
+						for (var i = 0; i < gcount; i++) {
+							var yh1 = (lastY + (i * (Math.max(-1, Math.min(1, (dgd - lastY))) || 0))) | 0;
+							var hfgh = (xh1 + (Math.max(0, Math.min(HHHSheight, yh1)) * HHHSwidth)) * 4;
+							gdfgdfgData[hfgh + 0] = 0;
+							gdfgdfgData[hfgh + 1] = 0;
+							gdfgdfgData[hfgh + 2] = 0;
+							gdfgdfgData[hfgh + 3] = 0;
+						}
+						lastY = dgd;
+					}
 					if (true) {
 						ctx.lineWidth = 1;
 						ctx.beginPath();
