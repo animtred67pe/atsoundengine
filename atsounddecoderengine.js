@@ -196,7 +196,7 @@ var ATSoundDecoderEngine = (function() {
 				const fullBlocks = blocks * (2 * (this.adpcmBlockSize - 4)) + 1;
 				const subBlock = Math.max((available % this.adpcmBlockSize) - 4, 0) * 2;
 				const incompleteBlock = Math.min(available % this.adpcmBlockSize, 1);
-				this.sampleLength = (fullBlocks + subBlock + incompleteBlock) | 0;
+				this.sampleLength = Math.floor((fullBlocks + subBlock + incompleteBlock) / this.channels) * this.channels;
 			}
 			this.type = 'IMA ADPCM ' + this.bitsPerSample + 'BIT';
 			this.execudeSample = this.getSampleADPCM;

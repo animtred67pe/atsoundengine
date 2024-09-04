@@ -18,6 +18,9 @@
 				text-decoration-line: underline;
 				cursor: pointer;
 			}
+			a:hover{
+				color: #aaa;
+			}
 			.hfgfhh {
 				background-color: #111;
 				width: 100%;
@@ -51,6 +54,21 @@
 				background-color: #ddd;
 				color: #111;
 			}
+			.dropdown {
+				float: right;
+				display: inline-block;
+				position: relative;
+			}
+			.dropdown > select {
+				position: absolute;
+				font: inherit;
+				opacity: 0;
+				cursor: pointer;
+				top: 0px;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+			}
 		</style>
 	</head>
 	<body>
@@ -62,6 +80,12 @@
 				<a id="dddwave" title="Convert WAV with 8-bit, 22050 sample">Convert WAV</a>
 				<label>volume:</label>
 				<input type="range" id="vol5" value="100" min="0" max="100" style="width: 100px;">
+				<a class="dropdown">Samples Sounds<select id="examples">
+					<option value="" style="display: none;"></option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/4e475567a1f5a7fb9faf0bd56e54847e.mp3/get/">Apogee</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/6df35bfc1e426074d7a883b41f4e7229.mp3/get/">H.A.W.T.W.</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/6534014c12c1f924a124f0b5d5d18d20.wav/get/">Sine Square Triangle Sawtooth Waveforms</option>
+				</select></a>
 				<br>
 				<canvas id="ccc" width="640" height="360"></canvas>
 			</div>
@@ -79,6 +103,25 @@
 			var cameraTime = 0;
 			var cameraZoom = 500;
 
+			function URLsearchParams(name, isBool) {
+				var _u = new URL(window.location.href);
+				if (isBool) {
+					if (_u.searchParams) {
+						return _u.searchParams.has(name);
+					} else {
+						return false;
+					}
+				} else {
+					if (_u.searchParams) {
+						return _u.searchParams.get(name);
+					} else {
+						return false;
+					}
+				}
+			}
+
+			var soundUrl = URLsearchParams("soundurl");
+
 			var Whe = 45;
 
 			var showtitle = false;
@@ -89,6 +132,7 @@
 			var fgdgdfg2 = document.getElementById("vol5");
 			var sstop = document.getElementById('sstop');
 			var dddwave = document.getElementById('dddwave');
+			var examples1 = document.getElementById('examples');
 			var controlss = [false, false];
 			var titleAn = [4, '', 0, 0, 0];
 			var cc = document.getElementById('ccc');
@@ -102,11 +146,11 @@
 				player.setVolume(fgdgdfg2.value / 100);
 			}, false);
 			function loadMidiFile(file) {
+				playstop.innerHTML = 'Play';
 				TITLE = file.name;
-				MDATE = file.lastModifiedDate.getDate() + '/' + (file.lastModifiedDate.getMonth() + 1) + '/' + file.lastModifiedDate.getFullYear();
+				//MDATE = file.lastModifiedDate.getDate() + '/' + (file.lastModifiedDate.getMonth() + 1) + '/' + file.lastModifiedDate.getFullYear();
 				var a = new FileReader();
 				a.onload = (function() {
-					playstop.innerHTML = 'Play';
 					setTimeout(function () {
 						player.loadAudio(a.result);
 						message33 = '';
@@ -118,6 +162,25 @@
 					}, 2);
 				}).bind(this);
 				a.readAsArrayBuffer(file);
+			}
+			function loadUrlAudioFile(url) {
+				playstop.innerHTML = 'Play';
+                var xhr = new XMLHttpRequest();
+                xhr.onload = function () {
+                    var data = xhr.response;
+					player.loadAudio(data);
+					message33 = '';
+					titleAn[0] = 0;
+					if (controlss[0]) {
+						playstop.innerHTML = 'Pause';
+						player.play();
+					}
+                };
+                xhr.onerror = function () {
+                };
+                xhr.responseType = "arraybuffer";
+                xhr.open("GET", url);
+                xhr.send();
 			}
 			var loadmidifile = document.getElementById('loadmidifile');
 			function dropHandler(ev) {
@@ -134,6 +197,10 @@
 			function dragOverHandler(ev) {
 				ev.preventDefault();
 			}
+			examples1.addEventListener('input', function() {
+				loadUrlAudioFile(examples1.value);
+				examples1.value = '';
+			}, false);
 			loadmidifile.onclick = function () {
 				var sa = document.createElement('input');
 				sa.type = 'file';
@@ -309,6 +376,9 @@
 			var gdfgdfgData = gdfgdfg.data;
 			var hjgfh = new Int16Array(65535);
 			var gfhgfhfhfgI = 0;
+
+			if (soundUrl) loadUrlAudioFile(soundUrl);
+			
 			setInterval(function () {
 				var isCo = positionY < Whe;
 				var spee = (1200);
@@ -334,16 +404,16 @@
 					var Hmfmg = (cc.height - Whe);
 					if (player.isEstreno) {
 						for (var i = 0; i < MAX4; i++) {
-							var s1 = Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg;
+							var s1 = Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg;
 							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_left[s1] || 0) + 1) / 2) * (Hmfmg / 2))) | 0;
 						}
 						for (var i = 0; i < MAX4; i++) {
-							var s2 = Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg;
+							var s2 = Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg;
 							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_right[s2] || 0) + 1) / 2) * (Hmfmg / 2) + (Hmfmg / 2))) | 0;
 						}
 					} else {
 						for (var i = 0; i < MAX4; i++) {
-							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_left[Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg] || 0) + 1) / 2) * Hmfmg)) | 0;
+							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_left[Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg] || 0) + 1) / 2) * Hmfmg)) | 0;
 						}
 					}
 					var ghgjjgh = gfhgfhfhfgI;

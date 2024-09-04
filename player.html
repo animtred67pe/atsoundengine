@@ -67,6 +67,22 @@
 				}
 				return txt;
 			}
+			function URLsearchParams(name, isBool) {
+				var _u = new URL(window.location.href);
+				if (isBool) {
+					if (_u.searchParams) {
+						return _u.searchParams.has(name);
+					} else {
+						return false;
+					}
+				} else {
+					if (_u.searchParams) {
+						return _u.searchParams.get(name);
+					} else {
+						return false;
+					}
+				}
+			}
 			function _createImage(url) {
 				const img = new Image;
 				img.src = url;
@@ -297,6 +313,7 @@
 				this._player.loadAudio(data);
 				if (this.autoPlay) this._player.play();
 			};
+			var soundUrl = URLsearchParams("soundurl");
 			var atp = new ATPlayer();
 			atp.midistats = document.getElementById('midifiletitle2');
 			atp.init(document.getElementById('audiocontextcontrol'));
@@ -309,6 +326,19 @@
 					}, 2);
 				}).bind(this);
 				a.readAsArrayBuffer(file);
+			}
+			function loadUrlAudioFile(url) {
+                var xhr = new XMLHttpRequest();
+                xhr.onload = function () {
+                    var data = xhr.response;
+					midifiletitle.textContent = "";
+					atp.loadAudio(data);
+                };
+                xhr.onerror = function () {
+                };
+                xhr.responseType = "arraybuffer";
+                xhr.open("GET", url);
+                xhr.send();
 			}
 			var loadmidifile = document.getElementById('loadmidifile');
 			var midifiletitle = document.getElementById('midifiletitle');
@@ -336,6 +366,7 @@
 				}, false);
 				sa.click();
 			}
+			if (soundUrl) loadUrlAudioFile(soundUrl);
 		</script>
 	</body>
 </html>
