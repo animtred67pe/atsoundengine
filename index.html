@@ -9,6 +9,7 @@
 				font-family: monospace;
 				margin: 0;
 				padding: 0;
+				overflow: hidden;
 			}
 			label{
 				color: #ddd;
@@ -23,11 +24,11 @@
 			}
 			.hfgfhh {
 				background-color: #111;
+				position: absolute;
 				width: 100%;
 				height: 100%;
-				position: absolute;
 			}
-			.playerr{
+			#playerr{
 				margin: 0;
 				padding: 9px;
 				border-radius: 10px;
@@ -36,13 +37,13 @@
 				left: 50%;
 				transform: translate(-50%, -50%);
 			}
-			.dgdggggg{
+			#dgdggggg{
 				position: absolute;
-				bottom: 15px;
+				bottom: 20px;
 				left: 50%;
 				transform: translate(-50%, 0%);
 			}
-			.dgdggggg a{
+			#dgdggggg a{
 				padding: 6px 6px;
 				border: 2px solid #ddd;
 				border-radius: 15px;
@@ -50,7 +51,7 @@
 				text-decoration-line: none;
 				transition: 0.2s;
 			}
-			.dgdggggg a:hover{
+			#dgdggggg a:hover{
 				background-color: #ddd;
 				color: #111;
 			}
@@ -73,7 +74,7 @@
 	</head>
 	<body>
 		<div class="hfgfhh">
-			<div class="playerr">
+			<div id="playerr">
 				<a id="loadmidifile">Load Audio</a>
 				<a id="playstop">Play</a>
 				<a id="sstop">Stop</a>
@@ -84,12 +85,19 @@
 					<option value="" style="display: none;"></option>
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/4e475567a1f5a7fb9faf0bd56e54847e.mp3/get/">Apogee</option>
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/6df35bfc1e426074d7a883b41f4e7229.mp3/get/">H.A.W.T.W.</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/b982baf9bd60ae2216120194766a8d41.mp3/get/">H.A.W.T.W. - Instrumental</option>
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/6534014c12c1f924a124f0b5d5d18d20.wav/get/">Sine Square Triangle Sawtooth Waveforms</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/8d3f3a07e6d6a7cbb5038ada613ea12a.mp3/get/">BlackGryph0n  Baasik  Crusader Are We There Yet</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/28378e3ea4399c08686388199a5cc829.mp3/get/">A Summer In the Stars (Original by Forest Rain)</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/2dae521acca19f898bc5376e93d7155e.wav/get/">Derpy Nyan Nyan IMA ADPCM</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/1c987f54e475d0ed77916de7eb830769.mp3/get/">Flutterwonder - SWF File Format (MP3 Sound Data)</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/8b316a0a81e28eb10ad832994304c54c.mp3/get/">Octavias Familiy</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/1d9cf5e6801515cbfaf7c16868d00a4e.mp3/get/">???</option>
 				</select></a>
 				<br>
 				<canvas id="ccc" width="640" height="360"></canvas>
 			</div>
-			<div class="dgdggggg">
+			<div id="dgdggggg">
 				<a href="player.html">Player</a>
 				<a href="about.html">About</a>
 			</div>
@@ -102,6 +110,8 @@
 			var positionY = 0;
 			var cameraTime = 0;
 			var cameraZoom = 500;
+
+			var scaleS = 2;
 
 			function URLsearchParams(name, isBool) {
 				var _u = new URL(window.location.href);
@@ -133,6 +143,8 @@
 			var sstop = document.getElementById('sstop');
 			var dddwave = document.getElementById('dddwave');
 			var examples1 = document.getElementById('examples');
+			var playerr = document.getElementById('playerr');
+			var dgdggggg = document.getElementById('dgdggggg');
 			var controlss = [false, false];
 			var titleAn = [4, '', 0, 0, 0];
 			var cc = document.getElementById('ccc');
@@ -372,14 +384,34 @@
 			var HHHSheight = (cc.height / 1) | 0;
 			cDat.width = HHHSwidth;
 			cDat.height = HHHSheight;
-			var gdfgdfg = ctx.createImageData(HHHSwidth, HHHSheight);
-			var gdfgdfgData = gdfgdfg.data;
+			var gdfgdfg = null;
+			var gdfgdfgData = null;
 			var hjgfh = new Int16Array(65535);
 			var gfhgfhfhfgI = 0;
+
+			function resize(w_, h_) {
+				cc.width = w_;
+				cc.height = h_;
+				HHHSwidth = (cc.width / 1) | 0;
+				HHHSheight = (cc.height / 1) | 0;
+				cDat.width = HHHSwidth;
+				cDat.height = HHHSheight;
+				gdfgdfg = ctx.createImageData(HHHSwidth, HHHSheight);
+				gdfgdfgData = gdfgdfg.data;
+			}
+
+			//window.addEventListener("resize", resize);
+
+			resize(640, 360);
 
 			if (soundUrl) loadUrlAudioFile(soundUrl);
 			
 			setInterval(function () {
+				if (true) {
+					Whe = 45;
+				} else {
+					Whe = 0;
+				}
 				var isCo = positionY < Whe;
 				var spee = (1200);
 				cameraZoom = 1;
@@ -390,7 +422,7 @@
 				ctx.beginPath();
 				ctx.rect(0,0, cc.width, cc.height);
 				ctx.fill();
-				MAX4 = cc.width;
+				MAX4 = HHHSwidth;
 				if (player.buffer) {
 					gfhgfhfhfgI = 0;
 					var _left = null;
@@ -401,19 +433,19 @@
 					}
 					var dfgdfg = Math.floor((player.currentTime / player.duration) * player.sampleCount);
 					ctx.lineWidth = 1;
-					var Hmfmg = (cc.height - Whe);
+					var Hmfmg = (HHHSheight - ((HHHSheight / cc.height) * Whe));
 					if (player.isEstreno) {
 						for (var i = 0; i < MAX4; i++) {
 							var s1 = Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg;
-							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_left[s1] || 0) + 1) / 2) * (Hmfmg / 2))) | 0;
+							hjgfh[gfhgfhfhfgI++] = (0 + ((((_left[s1] || 0) + 1) / 2) * (Hmfmg / 2))) | 0;
 						}
 						for (var i = 0; i < MAX4; i++) {
 							var s2 = Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg;
-							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_right[s2] || 0) + 1) / 2) * (Hmfmg / 2) + (Hmfmg / 2))) | 0;
+							hjgfh[gfhgfhfhfgI++] = (0 + ((((_right[s2] || 0) + 1) / 2) * (Hmfmg / 2) + (Hmfmg / 2))) | 0;
 						}
 					} else {
 						for (var i = 0; i < MAX4; i++) {
-							hjgfh[gfhgfhfhfgI++] = (Whe + ((((_left[Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg] || 0) + 1) / 2) * Hmfmg)) | 0;
+							hjgfh[gfhgfhfhfgI++] = (0 + ((((_left[Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg] || 0) + 1) / 2) * Hmfmg)) | 0;
 						}
 					}
 					var ghgjjgh = gfhgfhfhfgI;
@@ -422,7 +454,7 @@
 					while(gfhgfhfhfgI < ghgjjgh) {
 						var dgd = hjgfh[gfhgfhfhfgI++];
 						var gcount = Math.max(1, Math.abs(dgd - lastY));
-						var xh1 = ((gfhgfhfhfgI - 1) % 640) | 0;
+						var xh1 = ((gfhgfhfhfgI - 1) % HHHSwidth) | 0;
 						for (var i = 0; i < gcount; i++) {
 							var yh1 = (lastY + (i * (Math.max(-1, Math.min(1, (dgd - lastY))) || 0))) | 0;
 							var hfgh = (xh1 + (Math.max(0, Math.min(HHHSheight, yh1)) * HHHSwidth)) * 4;
@@ -436,13 +468,13 @@
 					ctxDat.clearRect(0,0,cDat.width, cDat.height);
 					ctxDat.putImageData(gdfgdfg, 0, 0);
 					ctx.imageSmoothingEnabled = false;
-					ctx.drawImage(cDat, 0, 0, cc.width, cc.height);
+					ctx.drawImage(cDat, 0, Whe, cc.width, cc.height);
 					gfhgfhfhfgI = 0;
 					lastY = 0;
 					while(gfhgfhfhfgI < ghgjjgh) {
 						var dgd = hjgfh[gfhgfhfhfgI++];
 						var gcount = Math.max(1, Math.abs(dgd - lastY));
-						var xh1 = ((gfhgfhfhfgI - 1) % 640) | 0;
+						var xh1 = ((gfhgfhfhfgI - 1) % HHHSwidth) | 0;
 						for (var i = 0; i < gcount; i++) {
 							var yh1 = (lastY + (i * (Math.max(-1, Math.min(1, (dgd - lastY))) || 0))) | 0;
 							var hfgh = (xh1 + (Math.max(0, Math.min(HHHSheight, yh1)) * HHHSwidth)) * 4;
@@ -453,7 +485,7 @@
 						}
 						lastY = dgd;
 					}
-					if (true) {
+					if (Whe) {
 						ctx.lineWidth = 1;
 						ctx.beginPath();
 						ctx.fillStyle = "#444";
@@ -511,7 +543,7 @@
 					}
 					ctx.fillText(getDuraction(mxct * player.duration), (Math.floor(mxct * cc.width)) + (isR ? -2 : 2), 10);
 				}
-				if (true) {
+				if (Whe) {
 					ctx.fillStyle = "#fff";
 					ctx.textAlign = "left";
 					var YSY = '';
@@ -520,6 +552,7 @@
 					YSY += ' SAMPLE COUNT: ' + player.sampleCount;
 					YSY += ' TYPE: ' + player.getType();
 					ctx.fillText(YSY, 0, Whe + 10);
+					ctx.fillText(getByte((((player.getLoadedTime() / player.duration) * (player.sampleCount * player.channels)) * 4) >>> 0), 0, Whe + 20);
 				}
 				if (titleAn[0] == 0) {
 					titleAn[0] = 1;
