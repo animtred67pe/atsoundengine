@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Anim Tred Sound Engine</title>
+		<title>AT Sound Engine</title>
 		<style>
 			body{
 				font-family: monospace;
@@ -81,7 +81,7 @@
 				<a id="dddwave" title="Convert WAV with 8-bit, 22050 sample">Convert WAV</a>
 				<label>volume:</label>
 				<input type="range" id="vol5" value="100" min="0" max="100" style="width: 100px;">
-				<a class="dropdown">Samples Sounds<select id="examples">
+				<a class="dropdown">Sample Audios<select id="examples">
 					<option value="" style="display: none;"></option>
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/4e475567a1f5a7fb9faf0bd56e54847e.mp3/get/">Apogee</option>
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/6df35bfc1e426074d7a883b41f4e7229.mp3/get/">H.A.W.T.W.</option>
@@ -93,6 +93,8 @@
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/1c987f54e475d0ed77916de7eb830769.mp3/get/">Flutterwonder - SWF File Format (MP3 Sound Data)</option>
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/8b316a0a81e28eb10ad832994304c54c.mp3/get/">Octavias Familiy</option>
 					<option value="https://assets.scratch.mit.edu/internalapi/asset/1d9cf5e6801515cbfaf7c16868d00a4e.mp3/get/">???</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/4142e4cc6382b3592cde88526160b7d4.wav/get/">Stereo Left and Right Stereo Sound Test (IMA ADPCM)</option>
+					<option value="https://assets.scratch.mit.edu/internalapi/asset/a5d181919f11cd6c5451a99dc342ed22.mp3/get/">aprender los numeros</option>
 				</select></a>
 				<br>
 				<canvas id="ccc" width="640" height="360"></canvas>
@@ -160,6 +162,7 @@
 			function loadMidiFile(file) {
 				playstop.innerHTML = 'Play';
 				TITLE = file.name;
+				window.location.hash = file.name;
 				//MDATE = file.lastModifiedDate.getDate() + '/' + (file.lastModifiedDate.getMonth() + 1) + '/' + file.lastModifiedDate.getFullYear();
 				var a = new FileReader();
 				a.onload = (function() {
@@ -176,6 +179,7 @@
 				a.readAsArrayBuffer(file);
 			}
 			function loadUrlAudioFile(url) {
+				window.location.hash = "";
 				playstop.innerHTML = 'Play';
                 var xhr = new XMLHttpRequest();
                 xhr.onload = function () {
@@ -347,7 +351,7 @@
 				GGint16(wavData, 22, 1); // channels; 1 = mono
 				GGint32(wavData, 24, 22050); // samplesPerSecond
 				GGint32(wavData, 28, 22050 * 1); // bytesPerSecond
-				GGint16(wavData, 32, 2); // blockAlignment
+				GGint16(wavData, 32, 1); // blockAlignment
 				GGint16(wavData, 34, 8); // bitsPerSample
 				// data chunk
 				wavData[36] = 100;

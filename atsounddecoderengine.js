@@ -1,7 +1,7 @@
 /*
  * Anim Tred Sound Decoder Engine
  *
- * v1.1.2 (20-09-2024)
+ * v1.1.3 (13-10-2024)
  *
  * (c) 2024 ATFSMedia Productions
  */
@@ -1476,7 +1476,7 @@ var ATSoundDecoderEngine = (function() {
 		this.firstHeader = this.readFrameHeader();
 		this.rate = this.firstHeader.samplingFrequency();
 		this.channels = this.firstHeader.numberOfChannels();
-		this.type = 'VERSION: ' + this.firstHeader.version + ' LAYER: ' + this.firstHeader.layer;
+		this.type = 'VERSION ' + this.firstHeader.version + ' LAYER ' + this.firstHeader.layer;
 		this.version = this.firstHeader.version;
 		this.stream.position = pos;
 		var frameStarts = [];
