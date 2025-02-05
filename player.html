@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Anim Tred Sound Engine Player</title>
+		<title>AT Sound Engine Player</title>
 		<style>
 			body {
 				margin: 0;
@@ -116,18 +116,22 @@
 				this.canvas = document.createElement('canvas');
 				this.ctx = this.canvas.getContext('2d');
 		        this.interval = null;
-		        this.variableNotUse = {"mouseDown":false};
+		    	this._t = false;
 			}
 			ATPlayer.prototype.init = function(dix) {
 				var _this = this;
 				dix.appendChild(this.canvas);
-				this.canvas.onmousedown = function () {
-					_this.mousePressed = true;
-				}
-				this.canvas.onmouseup = function () {
+				window.addEventListener("mousedown", function(e) {
+					if (e.target === _this.canvas) {
+						e.preventDefault();
+						_this.mousePressed = true;
+					} else {
+	    				_this._t = true;
+					}
+				});
+				window.addEventListener("mouseup", function(e) {
+					if (e.target === _this.canvas) e.preventDefault();
 					_this.mousePressed = false;
-				}
-				this.canvas.onclick = function () {
 					if (z_dir(25 - _this.mouseX, 25 - _this.mouseY) < 12) {
 						if (_this._player.isPaused) {
 							_this._player.play();
@@ -135,12 +139,16 @@
 							_this._player.pause();
 						}
 					}
-				}
-				this.canvas.onmousemove = function (e) {
-					var df = _this.canvas.getBoundingClientRect();
-					_this.mouseX = e.clientX - df.left;
-					_this.mouseY = e.clientY - df.top;
-				}
+	    			_this._t = false;
+				});
+				window.addEventListener("mousemove", function(e) {
+					if (!_this._t) {
+						e.preventDefault();
+						var df = _this.canvas.getBoundingClientRect();
+						_this.mouseX = e.clientX - df.left;
+						_this.mouseY = e.clientY - df.top;
+					}
+				});
 				this.canvas.width = 300;
 				this.canvas.height = 50;
 				this.interval = setInterval(this.step.bind(this), 5);
@@ -356,6 +364,8 @@
 			function dragOverHandler(ev) {
 				ev.preventDefault();
 			}
+			window.ondrop = dropHandler;
+			window.ondragover = dragOverHandler;
 			loadmidifile.onclick = function () {
 				var sa = document.createElement('input');
 				sa.type = 'file';

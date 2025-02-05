@@ -6,6 +6,7 @@
 		<title>AT Sound Engine</title>
 		<style>
 			body{
+				background-color: #111;
 				font-family: monospace;
 				margin: 0;
 				padding: 0;
@@ -21,12 +22,6 @@
 			}
 			a:hover{
 				color: #aaa;
-			}
-			.hfgfhh {
-				background-color: #111;
-				position: absolute;
-				width: 100%;
-				height: 100%;
 			}
 			#playerr{
 				margin: 0;
@@ -73,43 +68,45 @@
 		</style>
 	</head>
 	<body>
-		<div class="hfgfhh">
-			<div id="playerr">
-				<a id="loadmidifile">Load Audio</a>
-				<a id="playstop">Play</a>
-				<a id="sstop">Stop</a>
-				<a id="dddwave" title="Convert WAV with 8-bit, 22050 sample">Convert WAV</a>
-				<label>volume:</label>
-				<input type="range" id="vol5" value="100" min="0" max="100" style="width: 100px;">
-				<a class="dropdown">Sample Audios<select id="examples">
-					<option value="" style="display: none;"></option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/4e475567a1f5a7fb9faf0bd56e54847e.mp3/get/">Apogee</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/6df35bfc1e426074d7a883b41f4e7229.mp3/get/">H.A.W.T.W.</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/b982baf9bd60ae2216120194766a8d41.mp3/get/">H.A.W.T.W. - Instrumental</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/6534014c12c1f924a124f0b5d5d18d20.wav/get/">Sine Square Triangle Sawtooth Waveforms</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/8d3f3a07e6d6a7cbb5038ada613ea12a.mp3/get/">BlackGryph0n  Baasik  Crusader Are We There Yet</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/28378e3ea4399c08686388199a5cc829.mp3/get/">A Summer In the Stars (Original by Forest Rain)</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/2dae521acca19f898bc5376e93d7155e.wav/get/">Derpy Nyan Nyan IMA ADPCM</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/1c987f54e475d0ed77916de7eb830769.mp3/get/">Flutterwonder - SWF File Format (MP3 Sound Data)</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/8b316a0a81e28eb10ad832994304c54c.mp3/get/">Octavias Familiy</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/1d9cf5e6801515cbfaf7c16868d00a4e.mp3/get/">???</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/4142e4cc6382b3592cde88526160b7d4.wav/get/">Stereo Left and Right Stereo Sound Test (IMA ADPCM)</option>
-					<option value="https://assets.scratch.mit.edu/internalapi/asset/a5d181919f11cd6c5451a99dc342ed22.mp3/get/">aprender los numeros</option>
-				</select></a>
-				<br>
-				<canvas id="ccc" width="640" height="360"></canvas>
-			</div>
-			<div id="dgdggggg">
-				<a href="player.html">Player</a>
-				<a href="about.html">About</a>
-			</div>
+		<div id="playerr">
+			<a id="loadmidifile">Load Audio</a>
+			<a id="playstop">Play</a>
+			<a id="sstop">Stop</a>
+			<a id="dddwave" style="display: none;">Download File</a>
+			<label>volume:</label>
+			<input type="range" id="vol5" value="100" min="0" max="100" style="width: 100px;">
+			<a class="dropdown">Sample Audios<select id="examples">
+				<option value="" style="display: none;"></option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/4e475567a1f5a7fb9faf0bd56e54847e.mp3/get/">Apogee</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/6df35bfc1e426074d7a883b41f4e7229.mp3/get/">H.A.W.T.W.</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/b982baf9bd60ae2216120194766a8d41.mp3/get/">H.A.W.T.W. - Instrumental</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/6534014c12c1f924a124f0b5d5d18d20.wav/get/">Sine Square Triangle Sawtooth Waveforms</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/8d3f3a07e6d6a7cbb5038ada613ea12a.mp3/get/">BlackGryph0n  Baasik  Crusader Are We There Yet</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/28378e3ea4399c08686388199a5cc829.mp3/get/">A Summer In the Stars (Original by Forest Rain)</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/2dae521acca19f898bc5376e93d7155e.wav/get/">Derpy Nyan Nyan IMA ADPCM</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/1c987f54e475d0ed77916de7eb830769.mp3/get/">Flutterwonder - SWF File Format (MP3 Sound Data)</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/8b316a0a81e28eb10ad832994304c54c.mp3/get/">Octavias Familiy</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/1d9cf5e6801515cbfaf7c16868d00a4e.mp3/get/">???</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/4142e4cc6382b3592cde88526160b7d4.wav/get/">Stereo Left and Right Stereo Sound Test (IMA ADPCM)</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/a5d181919f11cd6c5451a99dc342ed22.mp3/get/">aprender los numeros</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/a157b6348965cf569d4a2ea60051664b.mp3/get/">Derp She Is Derpy  Doctor</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/c6b50549b311bafdbcd743f8e989367c.mp3/get/">MPEG2_LSF 1</option>
+				<option value="https://assets.scratch.mit.edu/internalapi/asset/c8fbd99435cd968aa73f360adc00c515.mp3/get/">MPEG2_LSF 2</option>
+			</select></a>
+			<br>
+			<canvas id="ccc" width="640" height="360"></canvas>
 		</div>
+		<div id="dgdggggg">
+			<a href="player.html">Player</a>
+			<a href="about.html">About</a>
+		</div>
+		<a href="https://animtred67pe.github.io/introtry9/" title="Go To SEATGERY Website" style="position:fixed; bottom: 10px; right: 10px; width: 50px; height: 50px;background-size: 50px; background-image: url(data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2250%22%20height%3D%2250%22%20viewBox%3D%220%2C0%2C50%2C50%22%3E%3Cg%20transform%3D%22translate%28-215%2C-155.2%29%22%3E%3Cg%20stroke%3D%22%23ffffff%22%3E%3Cpath%20d%3D%22M215.75%2C179.95c0%2C-13.3%2010.8%2C-24%2024%2C-24c13.3%2C0%2024%2C10.8%2024%2C24c0%2C13.3%20-10.8%2C24%20-24%2C24c-13.3%2C0%20-24%2C-10.8%20-24%2C-24z%22%20fill-opacity%3D%220.5%22%20fill%3D%22%23000000%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22butt%22%2F%3E%3Cpath%20d%3D%22M234.60%2C173.15c0%2C0%20-2.76%2C-1.04%20-4.9%2C-0.49c-1.97%2C0.5%20-3.11%2C1.94%20-2.75%2C3.92c0.35%2C1.97%201.94%2C2.86%204.08%2C3.44c2.15%2C0.58%205.84%2C2.47%203.42%2C5.76c-1.6%2C2.17%20-8.14%2C0.81%20-8.14%2C0.81%22%20fill%3D%22none%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M252.77%2C172.91c0%2C0%20-5.09%2C-1.3%20-8.56%2C0.76c-4.54%2C2.82%20-3.99%2C10.71%200.58%2C12.81c3.47%2C1.59%208.52%2C0.24%208.52%2C0.24l-0.04%2C-6.14l-4.16%2C-0.04%22%20fill%3D%22none%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E);"></a>
 		<script src="atsounddecoderengine.js"></script>
 		<script>
 			var MAX3 = 5000;
 			var MAX4 = 0;
-			var positionX = 0;
-			var positionY = 0;
+			var positionX = -10000;
+			var positionY = -10000;
 			var cameraTime = 0;
 			var cameraZoom = 500;
 
@@ -138,6 +135,8 @@
 
 			var showtitle = false;
 
+			var audioData = null;
+
 			var message33 = '';
 			var TITLE = '';
 			var MDATE = "";
@@ -163,6 +162,8 @@
 				playstop.innerHTML = 'Play';
 				TITLE = file.name;
 				window.location.hash = file.name;
+				dddwave.style.display = "none";
+				audioData = null;
 				//MDATE = file.lastModifiedDate.getDate() + '/' + (file.lastModifiedDate.getMonth() + 1) + '/' + file.lastModifiedDate.getFullYear();
 				var a = new FileReader();
 				a.onload = (function() {
@@ -184,6 +185,8 @@
                 var xhr = new XMLHttpRequest();
                 xhr.onload = function () {
                     var data = xhr.response;
+					dddwave.style.display = "";
+					audioData = data;
 					player.loadAudio(data);
 					message33 = '';
 					titleAn[0] = 0;
@@ -213,6 +216,9 @@
 			function dragOverHandler(ev) {
 				ev.preventDefault();
 			}
+			window.ondrop = dropHandler;
+			window.ondragover = dragOverHandler;
+			
 			examples1.addEventListener('input', function() {
 				loadUrlAudioFile(examples1.value);
 				examples1.value = '';
@@ -247,19 +253,38 @@
 				playstop.innerHTML = 'Play';
 				player.stop();
 			}
-			cc.onmousemove = function(e) {
+			function _mousemove(e) {
 				var df = cc.getBoundingClientRect();
 				positionX = e.clientX - df.left;
 				positionY = e.clientY - df.top;
 			}
-			cc.onmousedown = function(e) {
-				e.preventDefault();
-				if (positionY < Whe) {
-					player.setCurrentTime((positionX / cc.width) * player.duration);
+			function _mouseup(e) {
+				if (e.target === cc) e.preventDefault();
+			}
+			function _mousedown(e) {
+				if (e.target === cc) {
+					e.preventDefault();
+					if (positionY < Whe) {
+						player.setCurrentTime((positionX / cc.width) * player.duration);
+					}
 				}
 			}
-			cc.onmouseup = function(e) {
-				e.preventDefault();
+			if ("ontouchstart" in window) {
+				window.ontouchstart = function(e) {
+					var a = e.changedTouches[0];
+					if (a.target === cc) {
+						_mousemove(a);
+						if (positionY < Whe) {
+							player.setCurrentTime((positionX / cc.width) * player.duration);
+						}
+						positionX = -10000;
+						positionY = -10000;
+					}
+				}
+			} else {
+				window.onmousemove = _mousemove;
+				window.onmousedown = _mousedown;
+				window.onmouseup = _mouseup;	
 			}
 			function mod(x, y) {
 				var r = x % y;
@@ -306,83 +331,16 @@
 				}
 				return txt;
 			}
-			var int16view = new Int16Array(1);
-			var int32view = new Int32Array(1);
-			function GGint8(data, pos, cc) {
-				var fixval = (cc | 0) % 0x100;
-				data[pos] = fixval;
-			}
-			function GGint16(data, pos, cc) {
-				var fixval = (cc | 0) % 0x10000;
-				data[pos] = fixval % 256;
-				data[pos + 1] = Math.floor(fixval / 256);
-			}
-			function GGint32(data, pos, cc) {
-				var fixval = (cc | 0) % 0x100000000;
-				data[pos] = fixval % 256;
-				data[pos + 1] = Math.floor(fixval / 256);
-				data[pos + 2] = Math.floor(fixval / 0x10000);
-				data[pos + 3] = Math.floor(fixval / 0x1000000);
-			}
-			function Grint16(data, pos) {
-				var val = (data[pos] + (data[pos + 1] * 256));
-				return (val > 32767) ? (val - 0x10000) : val;
-			}
-			function downloadWAV() {
-				var rate = player.rate;
-				var sampleCount = Math.floor((player.sampleCount / rate) * 22050);
-				var wavData = new Uint8Array(36 + (8 + (1 * sampleCount)));
-				wavData[0] = 82;
-				wavData[1] = 73;
-				wavData[2] = 70;
-				wavData[3] = 70;
-				GGint32(wavData, 4, (1 * sampleCount) + 36); // total size (excluding 8-byte RIFF header)
-				wavData[8] = 87;
-				wavData[9] = 65;
-				wavData[10] = 86;
-				wavData[11] = 69;
-				// format chunk
-				wavData[12] = 102;
-				wavData[13] = 109;
-				wavData[14] = 116;
-				wavData[15] = 32;
-				GGint32(wavData, 16, 16); // format chunk size
-				GGint16(wavData, 20, 1); // encoding; 1 = PCM
-				GGint16(wavData, 22, 1); // channels; 1 = mono
-				GGint32(wavData, 24, 22050); // samplesPerSecond
-				GGint32(wavData, 28, 22050 * 1); // bytesPerSecond
-				GGint16(wavData, 32, 1); // blockAlignment
-				GGint16(wavData, 34, 8); // bitsPerSample
-				// data chunk
-				wavData[36] = 100;
-				wavData[37] = 97;
-				wavData[38] = 116;
-				wavData[39] = 97;
-				GGint32(wavData, 40, (1 * sampleCount)); // format chunk size
-				var _left = null;
-				var _right = null;
-				_left = player.buffer.getChannelData(0);
-				if (player.isEstreno) {
-					_right = player.buffer.getChannelData(1);
-				}
-				for (var i = 0; i < sampleCount; i++) {
-					var id = Math.floor((i / sampleCount) * player.sampleCount);
-					var l = 0;
-					if (_right) {
-						l = (_left[id] + _right[id]) / 2;
-					} else {
-						l = _left[id];
-					}
-					wavData[i + 44] = Math.round((l * 120)) + 128;
-				}
+			function downloadA() {
+				var wavData = new Uint8Array(audioData);
 				var bb = new Blob([wavData]);
 				var aaa = document.createElement('a');
 				aaa.href = URL.createObjectURL(bb);
-				aaa.download = 'atsounddecoder' + wavData.length + '.wav';
+				aaa.download = 'atsounddecoder' + wavData.length + '.' + player.getTypeFormat();
 				aaa.click();
 			}
 			dddwave.onclick = function() {
-				downloadWAV();
+				downloadA();
 			}
 			var HHHSwidth = (cc.width / 1) | 0;
 			var HHHSheight = (cc.height / 1) | 0;
@@ -411,13 +369,13 @@
 			if (soundUrl) loadUrlAudioFile(soundUrl);
 			
 			setInterval(function () {
-				if (true) {
+				if (true) { // (positionY >= 0) && (positionY < 120)
 					Whe = 45;
 				} else {
 					Whe = 0;
 				}
-				var isCo = positionY < Whe;
-				var spee = (1200);
+				var isCo = (positionY >= 0) && (positionY < Whe) && (positionX >= 0) && (positionX < cc.width);
+				var spee = 1200;
 				cameraZoom = 1;
 				cameraTime = 0;
 				ctx.lineWidth = 1;
@@ -440,16 +398,16 @@
 					var Hmfmg = (HHHSheight - ((HHHSheight / cc.height) * Whe));
 					if (player.isEstreno) {
 						for (var i = 0; i < MAX4; i++) {
-							var s1 = Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg;
+							var s1 = Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg;
 							hjgfh[gfhgfhfhfgI++] = (0 + ((((_left[s1] || 0) + 1) / 2) * (Hmfmg / 2))) | 0;
 						}
 						for (var i = 0; i < MAX4; i++) {
-							var s2 = Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg;
+							var s2 = Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg;
 							hjgfh[gfhgfhfhfgI++] = (0 + ((((_right[s2] || 0) + 1) / 2) * (Hmfmg / 2) + (Hmfmg / 2))) | 0;
 						}
 					} else {
 						for (var i = 0; i < MAX4; i++) {
-							hjgfh[gfhgfhfhfgI++] = (0 + ((((_left[Math.floor((i / MAX4) * ((player.rate / 40800) * spee)) + dfgdfg] || 0) + 1) / 2) * Hmfmg)) | 0;
+							hjgfh[gfhgfhfhfgI++] = (0 + ((((_left[Math.floor((i / MAX4) * ((player.rate / 44100) * spee)) + dfgdfg] || 0) + 1) / 2) * Hmfmg)) | 0;
 						}
 					}
 					var ghgjjgh = gfhgfhfhfgI;
