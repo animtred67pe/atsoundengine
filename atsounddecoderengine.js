@@ -1,19 +1,17 @@
 /*
- * Anim Tred Sound Decoder Engine
+ * Anim Tred Sound Decoder Engine in javscript(ES5)
  *
- * v1.2 (5-02-2025)
- *
- * (c) 2025 SEATGERY
+ * v1.2.1 (29-05-2025)
  */
 
 var ATSoundDecoderEngine = (function() {
-	const ArrayBufferStream = function(arrayBuffer, start = 0, end = arrayBuffer.byteLength) {
+	const ArrayBufferStream = function(arrayBuffer, start, end) {
 		this.arrayBuffer = arrayBuffer;
 		this.dataView = new DataView(this.arrayBuffer);
 		this.littleEndian = false;
-		this.start = start;
-		this.end = end;
-		this._position = start;
+		this.start = (start == null) ? 0 : start;
+		this.end = (end == null) ? arrayBuffer.byteLength : end;
+		this._position = this.start;
 	}
 	Object.defineProperties(ArrayBufferStream.prototype, {
 		position: {
@@ -112,7 +110,7 @@ var ATSoundDecoderEngine = (function() {
 	WAVStreamDecoder.INDEX_TABLE = [-1, -1, -1, -1, 2, 4, 6, 8, -1, -1, -1, -1, 2, 4, 6, 8];
 	WAVStreamDecoder.deltaDecoder = function(index, code) {
 		const step = WAVStreamDecoder.STEP_TABLE[index];
-		let delta = 0;
+		var delta = 0;
 		if (code & 4) delta += step;
 		if (code & 2) delta += step >> 1;
 		if (code & 1) delta += step >> 2;
@@ -242,7 +240,7 @@ var ATSoundDecoderEngine = (function() {
 		if (wavStr != 'WAVE') {
 			throw new Error('WAVFile: not a WAVE file');
 		}
-		return { lengthInHeader };
+		return { lengthInHeader: lengthInHeader };
 	}
 	WAVStreamDecoder.prototype.setChannels = function(buffer) {
 		this.channelLeft = buffer.getChannelData(0);
@@ -329,7 +327,7 @@ var ATSoundDecoderEngine = (function() {
 		const size = this.sampleLength;
 		var code;
 		if (this.channels == 2) {
-			let data_bytes_per_channel = this.samplesPerBlock - 1;
+			var data_bytes_per_channel = this.samplesPerBlock - 1;
 			var lastByte = -1;
 			var chan = [{ sample: 0, index: 0 }, { sample: 0, index: 0 }];
 			chan[0].sample = compressedData.readShort();
@@ -345,9 +343,9 @@ var ATSoundDecoderEngine = (function() {
 			var blockStart = this.sampleIndex / 2;
 			var blockLength = Math.min(data_bytes_per_channel, ((size - this.sampleIndex) / 2) | 0);
 			for (var i = 0; i < blockLength; i++) {
-				var channel = Math.floor(i / 4) & 1;
-				var offset = Math.floor(i / 8) * 8;
-				let _ = (i * 2) % 8;
+				var channel = (i >> 2) & 1;
+				var offset = (i >> 3) << 3;
+				var _ = (i << 1) & 7;
 				var chs = chan[channel];
 				for (var _i = 0; _i < 2; _i++) {
 					if (lastByte < 0) {
@@ -370,7 +368,7 @@ var ATSoundDecoderEngine = (function() {
 				}
 			}
 		} else {
-			let data_bytes_per_channel = this.samplesPerBlock - 1;
+			var data_bytes_per_channel = this.samplesPerBlock - 1;
 			var lastByte = -1;
 			var sample = compressedData.readShort();
 			var index = compressedData.readUnsignedByte();
@@ -441,8 +439,8 @@ var ATSoundDecoderEngine = (function() {
 		this.h_sample_frequency = 0;
 		this.h_number_of_subbands = 0;
 		this.h_intensity_stereo_bound = 0;
-		this.h_copyright = 0;
-		this.h_original = 0;
+		this.h_copyright = false;
+		this.h_original = false;
 		this.h_crc = 0;
 		this.framesize = 0;
 		this.nSlots = 0;
@@ -585,7 +583,7 @@ var ATSoundDecoderEngine = (function() {
 		return MP3Header.bitrate_str[this.h_version][this.h_layer - 1][this.h_bitrate_index];
 	}
 	MP3Header.prototype.sample_frequency_string = function() {
-		switch (h_sample_frequency) {
+		switch (this.h_sample_frequency) {
 			case MP3Header.THIRTYTWO:
 				if (this.h_version == MP3Header.MPEG1)
 					return "32 kHz";
@@ -779,25 +777,15 @@ var ATSoundDecoderEngine = (function() {
 			w[0] = (y[0] >> 2) & 1;
 			x[0] = (y[0] >> 1) & 1;
 			y[0] = y[0] & 1;
-			if (v[0] != 0)
-				if (br.hget1bit() != 0) v[0] = -v[0];
-			if (w[0] != 0)
-				if (br.hget1bit() != 0) w[0] = -w[0];
-			if (x[0] != 0)
-				if (br.hget1bit() != 0) x[0] = -x[0];
-			if (y[0] != 0)
-				if (br.hget1bit() != 0) y[0] = -y[0];
+			if (v[0] != 0) if (br.hget1bit() != 0) v[0] = -v[0];
+			if (w[0] != 0) if (br.hget1bit() != 0) w[0] = -w[0];
+			if (x[0] != 0) if (br.hget1bit() != 0) x[0] = -x[0];
+			if (y[0] != 0) if (br.hget1bit() != 0) y[0] = -y[0];
 		} else {
-			if (h.linbits != 0)
-				if ((h.xlen - 1) == x[0])
-					x[0] += br.hgetbits(h.linbits);
-			if (x[0] != 0)
-				if (br.hget1bit() != 0) x[0] = -x[0];
-			if (h.linbits != 0)
-				if ((h.ylen - 1) == y[0])
-					y[0] += br.hgetbits(h.linbits);
-			if (y[0] != 0)
-				if (br.hget1bit() != 0) y[0] = -y[0];
+			if (h.linbits != 0) if ((h.xlen - 1) == x[0]) x[0] += br.hgetbits(h.linbits);
+			if (x[0] != 0) if (br.hget1bit() != 0) x[0] = -x[0];
+			if (h.linbits != 0) if ((h.ylen - 1) == y[0]) y[0] += br.hgetbits(h.linbits);
+			if (y[0] != 0) if (br.hget1bit() != 0) y[0] = -y[0];
 		}
 		return error;
 	}
@@ -812,7 +800,7 @@ var ATSoundDecoderEngine = (function() {
 		this.samples = new Float32Array(32);
 		this.channel = channelnumber;
 		this.scalefactor = factor;
-		this.setEQ(this.eq);
+		this.setEQ(eq0);
 		this.reset();
 	}
 	SynthesisFilter.d = null;
@@ -1888,12 +1876,9 @@ var ATSoundDecoderEngine = (function() {
 		var gr_info = (si.ch[ch].gr[gr]);
 		scalefac_comp = gr_info.scalefac_compress;
 		if (gr_info.block_type == 2) {
-			if (gr_info.mixed_block_flag == 0)
-				blocktypenumber = 1;
-			else if (gr_info.mixed_block_flag == 1)
-				blocktypenumber = 2;
-			else
-				blocktypenumber = 0;
+			if (gr_info.mixed_block_flag == 0) blocktypenumber = 1;
+			else if (gr_info.mixed_block_flag == 1) blocktypenumber = 2;
+			else blocktypenumber = 0;
 		} else {
 			blocktypenumber = 0;
 		}
@@ -2010,7 +1995,14 @@ var ATSoundDecoderEngine = (function() {
 		y[0] = 0;
 		v[0] = 0;
 		w[0] = 0;
-		var part2_3_end = this.part2_start + si.ch[ch].gr[gr].part2_3_length;
+		var part2_3_length = si.ch[ch].gr[gr].part2_3_length;
+		if (part2_3_length == 0) {
+			for (var i = 0; i < 580; i++) {
+				is_1d[i] = 0;
+			}
+			return;
+		}
+		var part2_3_end = this.part2_start + part2_3_length;
 		var num_bits = 0;
 		var region1Start = 0;
 		var region2Start = 0;
@@ -2159,17 +2151,10 @@ var ATSoundDecoderEngine = (function() {
 			xr_1d[quotien][reste] = 0.0;
 		}
 	}
-	MP3Layer3.nr_of_sfb_block = [
-		[[6, 5, 5, 5], [9, 9, 9, 9], [6, 9, 9, 9]],
-		[[6, 5, 7, 3], [9, 9, 12, 6], [6, 9, 12, 6]],
-		[[11, 10, 0, 0], [18, 18, 0, 0], [15, 18, 0, 0]],
-		[[7, 7, 7, 0], [12, 12, 12, 0], [6, 15, 12, 0]],
-		[[6, 6, 6, 3], [12, 9, 9, 6], [6, 12, 9, 6]],
-		[[8, 8, 5, 0], [15, 12, 9, 0], [6, 18, 9, 0]]
-	];
+	MP3Layer3.nr_of_sfb_block = [[[6, 5, 5, 5], [9, 9, 9, 9], [6, 9, 9, 9]], [[6, 5, 7, 3], [9, 9, 12, 6], [6, 9, 12, 6]], [[11, 10, 0, 0], [18, 18, 0, 0], [15, 18, 0, 0]], [[7, 7, 7, 0], [12, 12, 12, 0], [6, 15, 12, 0]], [[6, 6, 6, 3], [12, 9, 9, 6], [6, 12, 9, 6]], [[8, 8, 5, 0], [15, 12, 9, 0], [6, 18, 9, 0]]];
 	var is_pos = new Int32Array(576);
 	var is_ratio = new Float32Array(576);
-	MP3Layer3.io = [[1.0000000000E+00, 8.4089641526E-01, 7.0710678119E-01, 5.9460355751E-01, 5.0000000001E-01, 4.2044820763E-01, 3.5355339060E-01, 2.9730177876E-01, 2.5000000001E-01, 2.1022410382E-01, 1.7677669530E-01, 1.4865088938E-01, 1.2500000000E-01, 1.0511205191E-01, 8.8388347652E-02, 7.4325444691E-02, 6.2500000003E-02, 5.2556025956E-02, 4.4194173826E-02, 3.7162722346E-02, 3.1250000002E-02, 2.6278012978E-02, 2.2097086913E-02, 1.8581361173E-02, 1.5625000001E-02, 1.3139006489E-02, 1.1048543457E-02, 9.2906805866E-03, 7.8125000006E-03, 6.5695032447E-03, 5.5242717285E-03, 4.6453402934E-03], [1.0000000000E+00, 7.0710678119E-01, 5.0000000000E-01, 3.5355339060E-01, 2.5000000000E-01, 1.7677669530E-01, 1.2500000000E-01, 8.8388347650E-02, 6.2500000001E-02, 4.4194173825E-02, 3.1250000001E-02, 2.2097086913E-02, 1.5625000000E-02, 1.1048543456E-02, 7.8125000002E-03, 5.5242717282E-03, 3.9062500001E-03, 2.7621358641E-03, 1.9531250001E-03, 1.3810679321E-03, 9.7656250004E-04, 6.9053396603E-04, 4.8828125002E-04, 3.4526698302E-04, 2.4414062501E-04, 1.7263349151E-04, 1.2207031251E-04, 8.6316745755E-05, 6.1035156254E-05, 4.3158372878E-05, 3.0517578127E-05, 2.1579186439E-05]]
+	MP3Layer3.io = [new Float32Array([1.0000000000E+00, 8.4089641526E-01, 7.0710678119E-01, 5.9460355751E-01, 5.0000000001E-01, 4.2044820763E-01, 3.5355339060E-01, 2.9730177876E-01, 2.5000000001E-01, 2.1022410382E-01, 1.7677669530E-01, 1.4865088938E-01, 1.2500000000E-01, 1.0511205191E-01, 8.8388347652E-02, 7.4325444691E-02, 6.2500000003E-02, 5.2556025956E-02, 4.4194173826E-02, 3.7162722346E-02, 3.1250000002E-02, 2.6278012978E-02, 2.2097086913E-02, 1.8581361173E-02, 1.5625000001E-02, 1.3139006489E-02, 1.1048543457E-02, 9.2906805866E-03, 7.8125000006E-03, 6.5695032447E-03, 5.5242717285E-03, 4.6453402934E-03]), new Float32Array([1.0000000000E+00, 7.0710678119E-01, 5.0000000000E-01, 3.5355339060E-01, 2.5000000000E-01, 1.7677669530E-01, 1.2500000000E-01, 8.8388347650E-02, 6.2500000001E-02, 4.4194173825E-02, 3.1250000001E-02, 2.2097086913E-02, 1.5625000000E-02, 1.1048543456E-02, 7.8125000002E-03, 5.5242717282E-03, 3.9062500001E-03, 2.7621358641E-03, 1.9531250001E-03, 1.3810679321E-03, 9.7656250004E-04, 6.9053396603E-04, 4.8828125002E-04, 3.4526698302E-04, 2.4414062501E-04, 1.7263349151E-04, 1.2207031251E-04, 8.6316745755E-05, 6.1035156254E-05, 4.3158372878E-05, 3.0517578127E-05, 2.1579186439E-05])]
 	MP3Layer3.TAN12 = new Float32Array([0.0, 0.26794919, 0.57735027, 1.0, 1.73205081, 3.73205081, 9.9999999e10, -3.73205081, -1.73205081, -1.0, -0.57735027, -0.26794919, 0.0, 0.26794919, 0.57735027, 1.0]);
 	MP3Layer3.cs = new Float32Array([0.857492925712, 0.881741997318, 0.949628649103, 0.983314592492, 0.995517816065, 0.999160558175, 0.999899195243, 0.999993155067]);
 	MP3Layer3.ca = new Float32Array([-0.5144957554270, -0.4717319685650, -0.3133774542040, -0.1819131996110, -0.0945741925262, -0.0409655828852, -0.0141985685725, -0.00369997467375]);
@@ -2203,7 +2188,7 @@ var ATSoundDecoderEngine = (function() {
 					lr[0][sb][ss + 2] = ro[0][sb][ss + 2];
 				}
 		} else {
-			var gr_info = (si.ch[0].gr[gr]);
+			var gr_info = si.ch[0].gr[gr];
 			var mode_ext = this.header.mode_extension();
 			var sfb = 0;
 			var i = 0;
@@ -2212,10 +2197,11 @@ var ATSoundDecoderEngine = (function() {
 			var i_stereo = ((this.header.mode() == MP3Header.JOINT_STEREO) && ((mode_ext & 0x1) != 0));
 			var lsf = ((this.header.version() == MP3Header.MPEG2_LSF || this.header.version() == MP3Header.MPEG25_LSF));
 			var io_type = (gr_info.scalefac_compress & 1);
-			for (i = 0; i < 576; i++) {
+			for (; i < 576; i++) {
 				is_pos[i] = 7;
-				is_ratio[i] = 0.0;
+				is_ratio[i] = 0;
 			}
+			i = 0;
 			if (i_stereo) {
 				if ((gr_info.window_switching_flag != 0) && (gr_info.block_type == 2)) {
 					if (gr_info.mixed_block_flag != 0) {
@@ -2264,8 +2250,8 @@ var ATSoundDecoderEngine = (function() {
 							for (; sb > 0; sb--) {
 								is_pos[i] = is_pos[sfb];
 								if (lsf) {
-									k[0][i] = k[0][sfb];
-									k[1][i] = k[1][sfb];
+                                    k[0][i] = k[0][sfb];
+                                    k[1][i] = k[1][sfb];
 								} else {
 									is_ratio[i] = is_ratio[sfb];
 								}
@@ -2584,46 +2570,10 @@ var ATSoundDecoderEngine = (function() {
 	MP3Layer3.prototype.inv_mdct = function(_in, out, block_type) {
 		var win_bt = 0;
 		var i = 0;
-		var tmpf_0, tmpf_1, tmpf_2, tmpf_3, tmpf_4, tmpf_5, tmpf_6, tmpf_7, tmpf_8, tmpf_9;
-		var tmpf_10, tmpf_11, tmpf_12, tmpf_13, tmpf_14, tmpf_15, tmpf_16, tmpf_17;
+		var tmpf_0, tmpf_1, tmpf_2, tmpf_3, tmpf_4, tmpf_5, tmpf_6, tmpf_7, tmpf_8, tmpf_9, tmpf_10, tmpf_11, tmpf_12, tmpf_13, tmpf_14, tmpf_15, tmpf_16, tmpf_17;
 		tmpf_0 = tmpf_1 = tmpf_2 = tmpf_3 = tmpf_4 = tmpf_5 = tmpf_6 = tmpf_7 = tmpf_8 = tmpf_9 = tmpf_10 = tmpf_11 = tmpf_12 = tmpf_13 = tmpf_14 = tmpf_15 = tmpf_16 = tmpf_17 = 0.0;
 		if (block_type == 2) {
-			out[0] = 0.0;
-			out[1] = 0.0;
-			out[2] = 0.0;
-			out[3] = 0.0;
-			out[4] = 0.0;
-			out[5] = 0.0;
-			out[6] = 0.0;
-			out[7] = 0.0;
-			out[8] = 0.0;
-			out[9] = 0.0;
-			out[10] = 0.0;
-			out[11] = 0.0;
-			out[12] = 0.0;
-			out[13] = 0.0;
-			out[14] = 0.0;
-			out[15] = 0.0;
-			out[16] = 0.0;
-			out[17] = 0.0;
-			out[18] = 0.0;
-			out[19] = 0.0;
-			out[20] = 0.0;
-			out[21] = 0.0;
-			out[22] = 0.0;
-			out[23] = 0.0;
-			out[24] = 0.0;
-			out[25] = 0.0;
-			out[26] = 0.0;
-			out[27] = 0.0;
-			out[28] = 0.0;
-			out[29] = 0.0;
-			out[30] = 0.0;
-			out[31] = 0.0;
-			out[32] = 0.0;
-			out[33] = 0.0;
-			out[34] = 0.0;
-			out[35] = 0.0;
+			for (i = 0; i < 36; i++) out[i] = 0;
 			var six_i = 0;
 			for (i = 0; i < 3; i++) {
 				_in[15 + i] += _in[12 + i];
@@ -2818,7 +2768,7 @@ var ATSoundDecoderEngine = (function() {
 		}
 	}
 	const SampleBuffer = function(sample_frequency, number_of_channels) {
-		this.buffer = new Int16Array(SampleBuffer.OBUFFERSIZE);
+		this.buffer = new Float32Array(SampleBuffer.OBUFFERSIZE);
 		this.bufferp = new Int32Array(SampleBuffer.MAXCHANNELS);
 		this.channels = number_of_channels;
 		this.frequency = sample_frequency;
@@ -2851,8 +2801,7 @@ var ATSoundDecoderEngine = (function() {
 		var fs;
 		for (var i = 0; i < 32; ) {
 			fs = f[i++];
-			fs = (fs > 32767.0 ? 32767.0 : (Math.max(fs, -32767.0)));
-			s = fs << 16 >> 16;
+			s = fs;
 			this.buffer[pos] = s;
 			pos += this.channels;
 		}
@@ -2866,7 +2815,7 @@ var ATSoundDecoderEngine = (function() {
 		this.output = out;
 	}
 	MP3Decoder.prototype.initialize = function(header) {
-		var scalefactor = 32700;
+		var scalefactor = 1;
 		var mode = header.mode();
 		var channels = mode == MP3Header.SINGLE_CHANNEL ? 1 : 2;
 		if (this.output == null) this.output = new SampleBuffer(header.frequency(), channels);
@@ -2954,7 +2903,7 @@ var ATSoundDecoderEngine = (function() {
 		var pcm = buf.getBuffer();
 		var sc = ((this.version == MP3Header.MPEG1) ? 1152 : 576) * this.channels;
 		for (var i = 0; i < sc; i++) {
-			this.writeSample(i % this.channels, this.sampleIndex + (i / this.channels) | 0, (pcm[i] / 32768));
+			this.writeSample(i % this.channels, this.sampleIndex + (i / this.channels) | 0, pcm[i]);
 		}
 	}
 	MP3StreamDecoder.prototype.start = function() {
@@ -3132,7 +3081,7 @@ var ATSoundDecoderEngine = (function() {
 	}
 	Player.prototype.step = function() {
 		var MaxLoadedTime = Math.max((this.duration / 6), 30);
-		var MaxProgressTime = MaxLoadedTime / 12;
+		var MaxProgressTime = MaxLoadedTime / 64;
 		if (this.stream) {
 			if ((this.getLoadedTime() - (Math.floor(this.currentTime / MaxProgressTime) * MaxProgressTime)) < MaxLoadedTime) this.stream.step();
 		}
@@ -3190,7 +3139,7 @@ var ATSoundDecoderEngine = (function() {
 		}
 	}
 	return {
-		Player,
-		ArrayBufferStream
+		Player: Player,
+		ArrayBufferStream: ArrayBufferStream
 	}
 }());

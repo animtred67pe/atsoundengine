@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>AT Sound Engine Player</title>
+		<title>AT Sound Player</title>
 		<style>
 			body {
 				margin: 0;
@@ -79,7 +79,7 @@
 					if (_u.searchParams) {
 						return _u.searchParams.get(name);
 					} else {
-						return false;
+						return null;
 					}
 				}
 			}
@@ -353,12 +353,13 @@
 			function dropHandler(ev) {
 				ev.preventDefault();
 				if (ev.dataTransfer.items) {
-					[...ev.dataTransfer.items].forEach((item, i) => {
+					var item = ev.dataTransfer.items[0];
+					if (item) {
 						if (item.kind === 'file') {
 							const file = item.getAsFile();
 							loadMidiFile(file);
-						}
-					});
+						}	
+					}
 				}
 			}
 			function dragOverHandler(ev) {
