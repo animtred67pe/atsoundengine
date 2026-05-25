@@ -1,7 +1,7 @@
 /*
  * EAAQ Sound Decoder Engine in javscript(ES5)
  *
- * v1.2.3 (24-11-2025)
+ * v1.2.3 (25-05-2026)
  *
  * (c) 2025 EAAQ
  */
@@ -399,20 +399,11 @@ var ATSoundDecoderEngine = (function() {
     }
   }
   //////// mp3.js ////////
-  var BitStream = function(vec) {
+  var BitStream = function() {
     this._end = 0;
     this.viewUint8 = null;
     this.bitPos = 0;
     this.bytePos = 0;
-  }
-  BitStream.prototype.readBit = function() {
-    if (this._end <= this.bytePos) return 0;
-    var tmp = (this.viewUint8[this.bytePos] >> (7 - (this.bitPos++)));
-    if (this.bitPos > 7) {
-      this.bitPos = 0;
-      this.bytePos++;
-    }
-    return tmp & 1;
   }
   BitStream.prototype.get_bits = function(num) {
     if (num === 0) return 0;
@@ -420,7 +411,15 @@ var ATSoundDecoderEngine = (function() {
     var value = 0;
     while (num--) {
       value <<= 1;
-      value |= this.readBit();
+      var v = 0;
+      if (this.bytePos < this._end) {
+        v = (this.viewUint8[this.bytePos] >> (7 - (this.bitPos++))) & 1;
+        if (this.bitPos > 7) {
+          this.bitPos = 0;
+          this.bytePos++;
+        }
+      }
+      value |= v;
     }
     return value;
   }

@@ -75,24 +75,6 @@
 			<a id="dddwave" style="display: none;">Download File</a>
 			<label>volume:</label>
 			<input type="range" id="vol5" value="100" min="0" max="100" style="width: 100px;">
-			<a class="dropdown">Sample Audios<select id="examples">
-				<option value="" style="display: none;"></option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/4e475567a1f5a7fb9faf0bd56e54847e.mp3/get/">Apogee</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/6df35bfc1e426074d7a883b41f4e7229.mp3/get/">H.A.W.T.W.</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/b982baf9bd60ae2216120194766a8d41.mp3/get/">H.A.W.T.W. - Instrumental</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/6534014c12c1f924a124f0b5d5d18d20.wav/get/">Sine Square Triangle Sawtooth Waveforms</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/8d3f3a07e6d6a7cbb5038ada613ea12a.mp3/get/">BlackGryph0n  Baasik  Crusader Are We There Yet</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/28378e3ea4399c08686388199a5cc829.mp3/get/">A Summer In the Stars (Original by Forest Rain)</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/2dae521acca19f898bc5376e93d7155e.wav/get/">Derpy Nyan Nyan IMA ADPCM</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/1c987f54e475d0ed77916de7eb830769.mp3/get/">Flutterwonder - SWF File Format (MP3 Sound Data)</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/8b316a0a81e28eb10ad832994304c54c.mp3/get/">Octavias Familiy</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/1d9cf5e6801515cbfaf7c16868d00a4e.mp3/get/">???</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/4142e4cc6382b3592cde88526160b7d4.wav/get/">Stereo Left and Right Stereo Sound Test (IMA ADPCM)</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/a5d181919f11cd6c5451a99dc342ed22.mp3/get/">aprender los numeros</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/a157b6348965cf569d4a2ea60051664b.mp3/get/">Derp She Is Derpy  Doctor</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/c6b50549b311bafdbcd743f8e989367c.mp3/get/">MPEG2_LSF 1</option>
-				<option value="https://assets.scratch.mit.edu/internalapi/asset/c8fbd99435cd968aa73f360adc00c515.mp3/get/">MPEG2_LSF 2</option>
-			</select></a>
 			<br>
 			<canvas id="ccc" width="640" height="360"></canvas>
 		</div>
@@ -143,7 +125,6 @@
 			var fgdgdfg2 = document.getElementById("vol5");
 			var sstop = document.getElementById('sstop');
 			var dddwave = document.getElementById('dddwave');
-			var examples1 = document.getElementById('examples');
 			var playerr = document.getElementById('playerr');
 			var dgdggggg = document.getElementById('dgdggggg');
 			var controlss = [false, false];
@@ -220,10 +201,6 @@
 			window.ondrop = dropHandler;
 			window.ondragover = dragOverHandler;
 			
-			examples1.addEventListener('input', function() {
-				loadUrlAudioFile(examples1.value);
-				examples1.value = '';
-			}, false);
 			loadmidifile.onclick = function () {
 				var sa = document.createElement('input');
 				sa.type = 'file';
